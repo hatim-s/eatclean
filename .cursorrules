@@ -1,0 +1,199 @@
+# Cursor Guidelines
+
+## Code Style
+- Use TypeScript for all new code
+- Prefer functional components with hooks
+- Use async/await over promises
+- Prefer named exports over default exports
+- Use const for variables that don't change
+- Use meaningful variable and function names
+
+## React/Next.js Specific
+- Use Server Components by default, Client Components only when needed
+- Mark Client Components with 'use client' directive
+- Use Next.js App Router conventions
+- Prefer Server Actions for mutations
+- Use TypeScript types/interfaces for all props and data structures
+
+## File Organization
+- Co-locate components with their styles when possible
+- Use kebab-case for file names
+- Group related files in feature folders
+- Keep components small and focused
+
+## Error Handling
+- Always handle errors explicitly
+- Use try/catch for async operations
+- Provide meaningful error messages
+- Log errors appropriately
+
+## Performance
+- Avoid unnecessary re-renders
+- Use React.memo for expensive components
+- Lazy load heavy components
+- Optimize images with Next.js Image component
+
+## Testing
+- Write tests for critical business logic
+- Test user interactions, not implementation details
+- Keep tests simple and readable
+
+## Documentation
+- Add JSDoc comments for complex functions
+- Document non-obvious code decisions
+- Keep README updated
+
+# EatClean - AI Coding Assistant Rules
+
+You are assisting with EatClean, a nutrition tracking app. Follow these rules strictly.
+
+## Mandatory Tech Stack
+
+Use ONLY these technologies. Do not suggest alternatives.
+
+- Runtime: Bun (not Node.js, not pnpm, not npm)
+- Framework: Next.js 15 with App Router (not Pages Router)
+- Language: TypeScript (strict mode)
+- Database: Turso with @libsql/client (not PostgreSQL, not Prisma, not MongoDB)
+- ORM: Drizzle (not Prisma, not TypeORM, not Kysely)
+- Auth: Better Auth (not Auth.js, not NextAuth, not Clerk, not Lucia)
+- AI: Vercel AI SDK with Groq provider (not LangChain, not direct API calls)
+- Styling: Tailwind CSS v4 (not styled-components, not CSS modules, not Sass)
+- Deployment: Vercel (not AWS, not Railway, not Fly.io)
+
+## Forbidden Patterns
+
+DO NOT use or suggest:
+- `getServerSideProps` or `getStaticProps` (use Server Components)
+- API routes for mutations (use Server Actions)
+- `axios` (use native fetch)
+- `moment` or `dayjs` (use native Date or Temporal)
+- `lodash` (use native array methods)
+- Client-side data fetching libraries like React Query or SWR unless caching is critical
+- State management libraries (Redux, Zustand, Jotai) unless explicitly approved
+- Component libraries (shadcn, Radix, Chakra, MUI) unless explicitly approved
+- `any` type in TypeScript
+- Default exports for components (use named exports)
+- Barrel files (index.ts re-exports)
+
+## Required Patterns
+
+ALWAYS follow these patterns:
+
+### File Structure
+```
+src/app/          → Routes and layouts only
+src/components/   → React components
+src/lib/          → Utilities, configs, clients
+src/actions/      → Server Actions
+src/types/        → TypeScript types
+```
+
+### Database (Drizzle + Turso)
+```typescript
+// Schema definition
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+
+export const users = sqliteTable("user", {
+  id: text("id").primaryKey(),
+  // ... fields
+});
+
+// Queries - use Drizzle query builder
+import { db } from "@/lib/db";
+import { eq } from "drizzle-orm";
+
+const user = await db.query.users.findFirst({
+  where: eq(users.id, userId),
+});
+```
+
+### Server Actions
+```typescript
+"use server";
+
+import { revalidatePath } from "next/cache";
+
+export async function createFoodLog(formData: FormData) {
+  // Validate with Zod or manual validation
+  // Insert into database
+  // Revalidate relevant paths
+  revalidatePath("/dashboard");
+}
+```
+
+### AI Integration (Vercel AI SDK)
+```typescript
+import { generateText } from "ai";
+import { groq } from "@ai-sdk/groq";
+
+const { text } = await generateText({
+  model: groq("llama-3.3-70b-versatile"),
+  prompt: "...",
+});
+```
+
+### Auth (Better Auth)
+```typescript
+// lib/auth.ts
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+
+export const auth = betterAuth({
+  database: drizzleAdapter(db, { provider: "sqlite" }),
+  socialProviders: {
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    },
+  },
+});
+```
+
+### Component Pattern
+```typescript
+// Named export, no "use client" unless needed
+export function FoodLogEntry({ entry }: { entry: FoodLog }) {
+  return (
+    <div className="p-4 border rounded-lg">
+      {/* Tailwind classes only */}
+    </div>
+  );
+}
+```
+
+## Code Style
+
+- Use `function` declarations for components, not arrow functions
+- Use `interface` for object shapes, `type` for unions/primitives
+- Prefer `const` over `let`, never use `var`
+- Use template literals for string interpolation
+- Use optional chaining (`?.`) and nullish coalescing (`??`)
+- Destructure props in function parameters
+- Keep components under 100 lines; extract logic to hooks or utilities
+
+## Error Handling
+
+- Use try/catch in Server Actions
+- Return `{ success: boolean, error?: string }` from actions
+- Use error.tsx for route error boundaries
+- Log errors server-side, show user-friendly messages client-side
+
+## Performance Rules
+
+- Mark components as `"use client"` only when they need:
+  - useState, useEffect, useRef
+  - Event handlers (onClick, onChange, etc.)
+  - Browser APIs
+- Use `loading.tsx` for suspense boundaries
+- Cache USDA API responses with `fetch(..., { next: { revalidate: 86400 } })`
+- Use `unstable_cache` for expensive database queries
+
+## When Asked to Add Dependencies
+
+Before adding any package, ask:
+1. Can this be done with native APIs?
+2. Is this in the approved stack?
+3. Does it have a free tier / is it zero-cost?
+
+If the answer to any is "no", reject the dependency and suggest alternatives within constraints.
