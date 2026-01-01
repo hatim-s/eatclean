@@ -83,4 +83,5 @@ export const foods = sqliteTable("foods", {
   vitaminB6: real("vitamin_b6").notNull(),
   vitaminB9: real("vitamin_b9").notNull(),
   vitaminB12: real("vitamin_b12").notNull(),
+  embedding: text("embedding"), // JSON-serialized float32 array for vector search
 });

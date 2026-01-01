@@ -1,11 +1,39 @@
 "use server";
 
-import { getGroqChatStreamFromPrompt } from "./streaming";
+import { FoodsWithPortions } from "@/types/ai";
+import { getGroqChatCompletionFromPrompt } from "./completion";
 
 export async function parseUserEntry(userEntry: string) {
-  const chatCompletion = await getGroqChatStreamFromPrompt(userEntry);
-  // Print the completion returned by the LLM.
-  for await (const chunk of chatCompletion) {
-    console.log(chunk.choices[0]?.delta?.content || "");
+  const chatCompletion = await getGroqChatCompletionFromPrompt(
+    userEntry,
+    undefined,
+    {
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "food_log",
+          schema: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                food: { type: "string" },
+                portion_size_gms: { type: "number" },
+              },
+              required: ["food", "portion_size_gms"],
+            },
+          },
+        },
+      },
+    }
+  );
+  const response = chatCompletion.choices[0]?.message?.content || "";
+  let responseJson: FoodsWithPortions = [];
+  try {
+    responseJson = JSON.parse(response);
+  } catch (error) {
+    console.error("Failed to parse JSON:", error);
+    // throw new Error("Failed to parse JSON");
   }
+  return responseJson;
 }
