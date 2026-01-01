@@ -13,5 +13,5 @@ export type NewAccount = InferInsertModel<typeof schema.account>;
 export type Verification = InferSelectModel<typeof schema.verification>;
 export type NewVerification = InferInsertModel<typeof schema.verification>;
 
-export type Food = InferSelectModel<typeof schema.foods>;
-export type NewFood = InferInsertModel<typeof schema.foods>;
+export type FoodItem = InferSelectModel<typeof schema.foods>;
+export type NewFoodItem = InferInsertModel<typeof schema.foods>;

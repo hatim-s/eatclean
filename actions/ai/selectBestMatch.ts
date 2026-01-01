@@ -1,6 +1,6 @@
 "use server";
 
-import { Food } from "@/types/db";
+import { FoodItem } from "@/types/db";
 import { getGroqChatCompletion } from "./completion";
 
 const BEST_MATCH_SYSTEM_PROMPT = `You are a nutrition database matcher. Given a user's food search term and a list of candidate foods from a database, select the single best match.
@@ -15,12 +15,12 @@ Rules:
 Output ONLY a single number (1-indexed) representing the best match. No explanation, no text, just the number.
 If none of the candidates are reasonable matches, output 0.`;
 
-export type MatchCandidate = Pick<Food, "id" | "name" | "category">;
+export type MatchCandidate = Pick<FoodItem, "id" | "name" | "category">;
 
 export async function selectBestMatch(
   searchTerm: string,
   candidates: MatchCandidate[]
-): Promise<Food["id"] | null> {
+): Promise<FoodItem["id"] | null> {
   if (candidates.length === 0) {
     return null;
   }
@@ -76,8 +76,8 @@ Which number is the best match?`;
 export async function selectBestMatches(
   searchTerms: string[],
   candidatesMap: Map<string, MatchCandidate[]>
-): Promise<Map<string, Food["id"] | null>> {
-  const results = new Map<string, Food["id"] | null>();
+): Promise<Map<string, FoodItem["id"] | null>> {
+  const results = new Map<string, FoodItem["id"] | null>();
 
   // Process in parallel for better performance
   const promises = searchTerms.map(async (term) => {

@@ -1,6 +1,6 @@
-export type FoodLogEntry = {
+export type FoodWithPortionEntry = {
   food: string;
   portion_size_gms: number;
 };
 
-export type FoodLog = FoodLogEntry[];
+export type FoodsWithPortions = FoodWithPortionEntry[];

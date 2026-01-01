@@ -3,19 +3,14 @@
 import { db } from "@/db/client";
 import { foods } from "@/db/schema";
 import { sql, isNotNull } from "drizzle-orm";
-import { Food } from "@/types/db";
-import { getEmbedding, serializeEmbedding } from "@/actions/ai/voyage";
+import { FoodItem } from "@/types/db";
 
-export type FoodWithDistance = Food & { distance: number };
+export type FoodWithDistance = FoodItem & { distance: number };
 
 export async function semanticFoodSearch(
-  foodName: string,
-  limit: number = 5
+  serializedEmbedding: string,
+  limit: number = 10
 ): Promise<FoodWithDistance[]> {
-  // Generate embedding for the search query
-  const queryEmbedding = await getEmbedding(foodName);
-  const serializedQuery = serializeEmbedding(queryEmbedding);
-
   // Use Turso's vector_distance_cos for cosine similarity search
   // Lower distance = more similar
   const results = await db
@@ -51,9 +46,10 @@ export async function semanticFoodSearch(
       vitaminB9: foods.vitaminB9,
       vitaminB12: foods.vitaminB12,
       embedding: foods.embedding,
-      distance: sql<number>`vector_distance_cos(${foods.embedding}, ${serializedQuery})`.as(
-        "distance"
-      ),
+      distance:
+        sql<number>`vector_distance_cos(${foods.embedding}, ${serializedEmbedding})`.as(
+          "distance"
+        ),
     })
     .from(foods)
     .where(isNotNull(foods.embedding))
@@ -67,7 +63,7 @@ export async function semanticFoodSearch(
 export async function fallbackLexicalSearch(
   foodName: string,
   limit: number = 10
-): Promise<Food[]> {
+): Promise<FoodItem[]> {
   const { like } = await import("drizzle-orm");
   const searchPattern = `%${foodName}%`;
 
@@ -84,10 +80,10 @@ export async function fallbackLexicalSearch(
 export async function hybridFoodSearch(
   foodName: string,
   limit: number = 10
-): Promise<Food[]> {
+): Promise<FoodItem[]> {
   try {
     const semanticResults = await semanticFoodSearch(foodName, limit);
-    
+
     // If we got good semantic results, return them
     if (semanticResults.length > 0) {
       return semanticResults;
@@ -99,4 +95,3 @@ export async function hybridFoodSearch(
   // Fall back to lexical search
   return fallbackLexicalSearch(foodName, limit);
 }
-

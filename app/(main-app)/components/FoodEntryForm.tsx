@@ -3,9 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/ui/components/base/button";
 import { Textarea } from "@/ui/components/base/textarea";
-import { parseUserEntry } from "@/actions/ai/parseUserEntry";
-import { FoodLog } from "@/types/ai";
-import { createFoodLog } from "@/actions/db/createFoodLog";
+import { createFoodLog } from "@/actions/createFoodLog";
 
 export function FoodEntryForm() {
   const [input, setInput] = useState("");
@@ -19,12 +17,11 @@ export function FoodEntryForm() {
     setIsLoading(true);
     setResponse("");
     try {
-      const result = await parseUserEntry(input);
-      setResponse(result);
-
-      const foodLog = JSON.parse(result) as FoodLog;
-      const matchesMap = await createFoodLog(foodLog);
+      const matchesMap = await createFoodLog(input);
       console.log(matchesMap);
+
+      const { foodVsNutrition } = matchesMap;
+      setResponse(JSON.stringify(foodVsNutrition, null, 2));
     } catch (error) {
       setResponse(
         `Error: ${error instanceof Error ? error.message : "Unknown error"}`
@@ -48,7 +45,7 @@ export function FoodEntryForm() {
         </Button>
       </form>
       {response && (
-        <pre className="p-4 bg-zinc-100 dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 whitespace-pre-wrap break-words">
+        <pre className="p-4 bg-zinc-100 dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 whitespace-pre-wrap wrap-break-word">
           {response}
         </pre>
       )}
