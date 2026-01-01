@@ -44,7 +44,7 @@ export async function createFoodLog(userInput: string) {
     const serializedEmbedding = serializeEmbedding(foodEmbedding);
 
     // semantic search
-    const candidates = await semanticFoodSearch(serializedEmbedding, 5);
+    const candidates = await semanticFoodSearch(serializedEmbedding);
     foodVsCandidates.set(foodName, candidates);
   }
 

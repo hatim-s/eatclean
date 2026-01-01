@@ -9,7 +9,7 @@ export type FoodWithDistance = FoodItem & { distance: number };
 
 export async function semanticFoodSearch(
   serializedEmbedding: string,
-  limit: number = 10
+  limit: number = 20
 ): Promise<FoodWithDistance[]> {
   // Use Turso's vector_distance_cos for cosine similarity search
   // Lower distance = more similar
