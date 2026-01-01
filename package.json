@@ -6,7 +6,10 @@
     "dev": "bun --bun next dev",
     "build": "bun --bun next build",
     "start": "bun --bun next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "bun --bun scripts/seed-foods.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.0.0",
