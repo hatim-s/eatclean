@@ -83,6 +83,28 @@ type Feature = {
   protein: number;
   carbs: number;
   fat: number;
+  fiber: number;
+  saturatedFat: number;
+  omega3: number;
+  omega6: number;
+  sodium: number;
+  potassium: number;
+  calcium: number;
+  iron: number;
+  magnesium: number;
+  zinc: number;
+  vitaminA: number;
+  vitaminC: number;
+  vitaminD: number;
+  vitaminE: number;
+  vitaminK: number;
+  vitaminB1: number;
+  vitaminB2: number;
+  vitaminB3: number;
+  vitaminB5: number;
+  vitaminB6: number;
+  vitaminB9: number;
+  vitaminB12: number;
 };
 
 type ComboboxProps = {
@@ -506,16 +528,12 @@ const CalendarItem = memo(({ feature, className }: CalendarItemProps) => {
           <div className="h-2 w-2 shrink-0 rounded-full bg-green-400" />
           {feature.protein}
         </span>
-        {/* </div> */}
 
-        {/* <div className="flex flex-row gap-2 items-center"> */}
         <span className="flex flex-row gap-2 items-center">
           <div className="h-2 w-2 shrink-0 rounded-full bg-yellow-400" />
           {feature.carbs}
         </span>
-        {/* </div> */}
 
-        {/* <div className="flex flex-row gap-2 items-center"> */}
         <span className="flex flex-row gap-2 items-center">
           <div className="h-2 w-2 shrink-0 rounded-full bg-red-400" />
           {feature.fat}
