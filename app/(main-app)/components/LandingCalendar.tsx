@@ -1,5 +1,7 @@
 "use client";
 
+import { Plus } from "lucide-react";
+
 import {
   CalendarBody,
   CalendarDate,
@@ -12,8 +14,9 @@ import {
 } from "@/ui/components/calendar";
 import { FoodLogDialog } from "./FoodLogDialog";
 import { DailySummary } from "@/types/db";
-import { parseISO } from "date-fns";
+import { parseISO, isSameDay } from "date-fns";
 import { useMemo } from "react";
+import { cn } from "@/ui/lib/utils";
 
 // earliest year is the current year
 const earliestYear = new Date().getFullYear();
@@ -68,10 +71,69 @@ function LandingCalendar({ summaries }: { summaries: DailySummary[] }) {
       <CalendarHeader className="border-b-0" />
       <CalendarBody
         features={features}
-        className="border rounded-3xl overflow-clip"
+        className="border-none"
+        renderDay={({ day, date, features, isToday }) => {
+          const feature = features[0];
+          if (feature) {
+            return (
+              <FoodLogDialog
+                key={day}
+                foodLog={feature}
+                date={date}
+                isToday={isToday}
+              />
+            );
+          }
+
+          return (
+            <button
+              key={day}
+              className={cn(
+                "size-full h-32 p-1.5 sm:p-2 rounded-xl border transition-all text-left flex flex-col",
+                isToday
+                  ? "border-emerald-500/50 bg-emerald-500/10"
+                  : "border-zinc-800 hover:border-zinc-700 bg-zinc-900/50"
+              )}
+            >
+              <span
+                className={cn(
+                  "text-xs sm:text-sm font-medium",
+                  isToday ? "text-emerald-400" : "text-zinc-400"
+                )}
+              >
+                {day}
+              </span>
+              <div className="flex-1 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                <Plus size={16} className="text-zinc-600" />
+              </div>
+            </button>
+          );
+        }}
       >
-        {({ feature }) => <FoodLogDialog foodLog={feature} key={feature.id} />}
+        {({ feature }) => (
+          <FoodLogDialog
+            foodLog={feature}
+            key={feature.id}
+            date={feature.date}
+            isToday={isSameDay(feature.date, new Date())}
+          />
+        )}
       </CalendarBody>
+
+      <div className="flex items-center justify-center gap-6 mt-6 text-xs text-zinc-500">
+        <div className="flex items-center gap-1.5">
+          <div className="w-3 h-1 bg-emerald-500 rounded-full" />
+          <span>Protein</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-3 h-1 bg-amber-500 rounded-full" />
+          <span>Carbs</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-3 h-1 bg-rose-500 rounded-full" />
+          <span>Fat</span>
+        </div>
+      </div>
     </CalendarProvider>
   );
 }

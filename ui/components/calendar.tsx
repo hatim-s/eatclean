@@ -231,10 +231,16 @@ type CalendarBodyProps = {
   features: Feature[];
   className?: string;
   children: (props: { feature: Feature }) => ReactNode;
+  renderDay?: (props: {
+    day: number;
+    date: Date;
+    features: Feature[];
+    isToday: boolean;
+  }) => ReactNode;
 };
 
 const CalendarBody = memo(
-  ({ features, children, className }: CalendarBodyProps) => {
+  ({ features, children, className, renderDay }: CalendarBodyProps) => {
     const month = useCalendarMonth();
     const year = useCalendarYear();
     const { startDay } = useContext(CalendarContext);
@@ -297,7 +303,7 @@ const CalendarBody = memo(
     for (let i = 0; i < firstDay; i++) {
       const day =
         prevMonthData.prevMonthDaysArray[
-          prevMonthData.prevMonthDays - firstDay + i
+        prevMonthData.prevMonthDays - firstDay + i
         ];
 
       if (day) {
@@ -305,25 +311,44 @@ const CalendarBody = memo(
       }
     }
 
+    const today = new Date();
+    const isCurrentMonth =
+      today.getFullYear() === year && today.getMonth() === month;
+
     for (let day = 1; day <= daysInMonth; day++) {
       const featuresForDay = featuresByDay[day] || [];
+      const date = new Date(year, month, day);
+      const isToday = isCurrentMonth && day === today.getDate();
 
-      days.push(
-        <div
-          className="relative flex h-full w-full flex-col gap-1 p-1"
-          key={day}
-        >
-          <span className="text-xs font-bold ms-4 mt-2">{day}</span>
-          <div className="text-sm">
-            {featuresForDay.slice(0, 3).map((feature) => children({ feature }))}
+      if (renderDay) {
+        days.push(
+          renderDay({
+            day,
+            date,
+            features: featuresForDay,
+            isToday,
+          })
+        );
+      } else {
+        days.push(
+          <div
+            className="relative flex h-full w-full flex-col gap-1 p-1"
+            key={day}
+          >
+            <span className="text-xs font-bold ms-4 mt-2">{day}</span>
+            <div className="text-sm">
+              {featuresForDay
+                .slice(0, 3)
+                .map((feature) => children({ feature }))}
+            </div>
+            {featuresForDay.length > 3 && (
+              <span className="block text-muted-foreground text-xs">
+                +{featuresForDay.length - 3} more
+              </span>
+            )}
           </div>
-          {featuresForDay.length > 3 && (
-            <span className="block text-muted-foreground text-xs">
-              +{featuresForDay.length - 3} more
-            </span>
-          )}
-        </div>
-      );
+        );
+      }
     }
 
     const remainingDays = 7 - ((firstDay + daysInMonth) % 7);
@@ -338,15 +363,16 @@ const CalendarBody = memo(
     }
 
     return (
-      <div className={cn("grid grow grid-cols-7", className)}>
+      <div className={cn("grid grow grid-cols-7 gap-1 sm:gap-2", className)}>
         {days.map((day, index) => (
           <div
             className={cn(
-              "relative overflow-hidden border-r",
+              "relative overflow-hidden",
+              !renderDay && "border-r",
               // do not show top border on the first row
-              { "border-t": index >= 7 },
+              !renderDay && { "border-t": index >= 7 },
               // do not show right border on the last column
-              { "border-r-0": index % 7 === 6 }
+              !renderDay && { "border-r-0": index % 7 === 6 }
             )}
             key={index}
           >
