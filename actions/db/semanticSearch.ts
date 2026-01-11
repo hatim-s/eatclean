@@ -1,11 +1,50 @@
 "use server";
 
-import { db } from "@/db/client";
+import { db, client } from "@/db/client";
 import { foods } from "@/db/schema";
-import { sql, isNotNull } from "drizzle-orm";
+import { sql, isNotNull, like } from "drizzle-orm";
 import { FoodItem } from "@/types/db";
 
 export type FoodWithDistance = FoodItem & { distance: number };
+
+/**
+ * FTS5 full-text search on food names (O(log n) vs O(n) for vector search)
+ * Uses FTS5 virtual table with MATCH query and prefix wildcard
+ */
+export async function ftsFoodSearch(
+  foodName: string,
+  limit: number = 20
+): Promise<FoodItem[]> {
+  // Sanitize input for FTS5 query - escape special characters and add prefix wildcard
+  const sanitized = foodName
+    .replace(/['"]/g, "") // Remove quotes
+    .replace(/[^\w\s]/g, " ") // Replace special chars with spaces
+    .trim();
+
+  if (!sanitized) {
+    return [];
+  }
+
+  // Build FTS5 query with prefix matching for each word
+  const terms = sanitized.split(/\s+/).filter(Boolean);
+  const ftsQuery = terms.map((term) => `${term}*`).join(" ");
+
+  try {
+    // Use libSQL client directly for FTS5 raw SQL query
+    const result = await client.execute({
+      sql: `SELECT foods.* FROM foods_fts 
+            JOIN foods ON foods_fts.rowid = foods.id 
+            WHERE foods_fts MATCH ?
+            ORDER BY rank 
+            LIMIT ?`,
+      args: [ftsQuery, limit],
+    });
+    return result.rows as unknown as FoodItem[];
+  } catch (error) {
+    console.warn("FTS search failed, falling back to lexical search:", error);
+    return fallbackLexicalSearch(foodName, limit);
+  }
+}
 
 export async function semanticFoodSearch(
   serializedEmbedding: string,

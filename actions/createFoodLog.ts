@@ -2,14 +2,13 @@
 
 import { FoodWithPortionEntry } from "@/types/ai";
 import { FoodItem } from "@/types/db";
-import { FoodWithDistance, semanticFoodSearch } from "./db/semanticSearch";
+import { ftsFoodSearch } from "./db/semanticSearch";
 import { MatchCandidate, selectBestMatch } from "@/actions/ai/selectBestMatch";
 import { parseUserEntry } from "./ai/parseUserEntry";
 import {
   CalculatedNutrition,
   calculateNutritionFromPortion,
 } from "./lib/calculateNutritionFromPortion";
-import { getEmbeddings, serializeEmbedding } from "./ai/voyage";
 
 export type FoodLogResult = {
   entry: FoodWithPortionEntry;
@@ -31,24 +30,17 @@ export async function createFoodLog(userInput: string) {
     };
   }
 
-  // Step 2: Get embeddings for the food names
+  // Step 2: FTS5 search to find candidates for each food name (no embeddings needed)
   const foodNames = foodLog.map((f) => f.food);
-  const fetchedEmbeddings = await getEmbeddings(foodNames, "query");
+  const foodVsCandidates = new Map<string, FoodItem[]>();
 
-  // Step 3: Semantic search to find candidates for each food name
-  const foodVsCandidates = new Map<string, FoodWithDistance[]>();
-  for (let i = 0; i < foodLog.length; i += 1) {
-    const foodName = foodNames[i];
-    const foodEmbedding = fetchedEmbeddings[i];
-
-    const serializedEmbedding = serializeEmbedding(foodEmbedding);
-
-    // semantic search
-    const candidates = await semanticFoodSearch(serializedEmbedding);
+  for (const foodName of foodNames) {
+    // FTS5 search - O(log n) vs O(n) for vector search
+    const candidates = await ftsFoodSearch(foodName);
     foodVsCandidates.set(foodName, candidates);
   }
 
-  // Step 4: AI-based best match selection for each food name
+  // Step 3: AI-based best match selection for each food name
   // currently pick the first item
   const foodVsMatches = new Map<string, FoodItem>();
   const foodVsAllMatches = new Map<string, FoodItem[]>();
@@ -65,7 +57,7 @@ export async function createFoodLog(userInput: string) {
     foodVsAllMatches.set(foodName, candidates);
   }
 
-  // Step 5: Calculate the nutrition for each food name
+  // Step 4: Calculate the nutrition for each food name
   const foodVsNutrition: Record<string, CalculatedNutrition> = {};
   for (const [foodName, match] of foodVsMatches) {
     const nutrition = calculateNutritionFromPortion(
@@ -75,7 +67,7 @@ export async function createFoodLog(userInput: string) {
     foodVsNutrition[foodName] = nutrition;
   }
 
-  // Step 6: Return the results
+  // Step 5: Return the results
   return {
     foodVsMatches,
     foodVsAllMatches,
