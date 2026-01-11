@@ -17,44 +17,61 @@ export async function createFoodLogEntry(
   const userId = session.user.id;
   const logDate = data.logDate;
 
-  return await db.transaction(async (tx) => {
-    // Insert food log
-    const [newLog] = await tx
-      .insert(foodLog)
-      .values({
-        ...data,
-        userId,
-      })
-      .returning();
+  try {
+    return await db.transaction(async (tx) => {
+      // Insert food log
+      const [newLog] = await tx
+        .insert(foodLog)
+        .values({
+          ...data,
+          userId,
+        })
+        .returning();
 
-    // Get all logs for this day
-    const dayLogs = await tx
-      .select()
-      .from(foodLog)
-      .where(and(eq(foodLog.userId, userId), eq(foodLog.logDate, logDate)));
+      // Get all logs for this day
+      const dayLogs = await tx
+        .select()
+        .from(foodLog)
+        .where(and(eq(foodLog.userId, userId), eq(foodLog.logDate, logDate)));
 
-    // Calculate totals from all items in all logs
-    const totals = sumNutritionFromLogItems(dayLogs);
+      // Calculate totals from all items in all logs
+      const totals = sumNutritionFromLogItems(dayLogs);
 
-    // Upsert daily summary
-    await tx
-      .insert(dailySummary)
-      .values({
-        userId,
-        date: logDate,
-        ...totals,
-        updatedAt: new Date(),
-      })
-      .onConflictDoUpdate({
-        target: [dailySummary.userId, dailySummary.date],
-        set: {
+      // Upsert daily summary
+      // Check if summary exists first, then update or insert
+      const [existing] = await tx
+        .select()
+        .from(dailySummary)
+        .where(
+          and(eq(dailySummary.userId, userId), eq(dailySummary.date, logDate))
+        )
+        .limit(1);
+
+      if (existing) {
+        await tx
+          .update(dailySummary)
+          .set({
+            ...totals,
+            updatedAt: new Date(),
+          })
+          .where(
+            and(eq(dailySummary.userId, userId), eq(dailySummary.date, logDate))
+          );
+      } else {
+        await tx.insert(dailySummary).values({
+          userId,
+          date: logDate,
           ...totals,
           updatedAt: new Date(),
-        },
-      });
+        });
+      }
 
-    return newLog;
-  });
+      return newLog;
+    });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to create food log entry", { cause: error });
+  }
 }
 
 export async function getFoodLogById(id: string): Promise<FoodLogType | null> {
@@ -130,22 +147,33 @@ export async function deleteFoodLog(id: string): Promise<void> {
       // Recalculate totals
       const totals = sumNutritionFromLogItems(dayLogs);
 
-      // Update summary
-      await tx
-        .insert(dailySummary)
-        .values({
+      // Update summary - check if exists first
+      const [existing] = await tx
+        .select()
+        .from(dailySummary)
+        .where(
+          and(eq(dailySummary.userId, userId), eq(dailySummary.date, logDate))
+        )
+        .limit(1);
+
+      if (existing) {
+        await tx
+          .update(dailySummary)
+          .set({
+            ...totals,
+            updatedAt: new Date(),
+          })
+          .where(
+            and(eq(dailySummary.userId, userId), eq(dailySummary.date, logDate))
+          );
+      } else {
+        await tx.insert(dailySummary).values({
           userId,
           date: logDate,
           ...totals,
           updatedAt: new Date(),
-        })
-        .onConflictDoUpdate({
-          target: [dailySummary.userId, dailySummary.date],
-          set: {
-            ...totals,
-            updatedAt: new Date(),
-          },
         });
+      }
     }
   });
 }

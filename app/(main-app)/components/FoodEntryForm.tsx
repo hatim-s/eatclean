@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/ui/components/base/button";
 import { Textarea } from "@/ui/components/base/textarea";
 import { createFoodLog } from "@/actions/createFoodLog";
+import { createFoodLogEntry } from "@/actions/db/foodLog";
 
 export function FoodEntryForm() {
   const [input, setInput] = useState("");
@@ -18,9 +19,30 @@ export function FoodEntryForm() {
     setResponse("");
     try {
       const matchesMap = await createFoodLog(input);
+      console.log(matchesMap);
 
-      const { foodVsNutrition, accumulatedNutrition } = matchesMap;
-      setResponse(JSON.stringify({ ...foodVsNutrition, accumulatedNutrition }, null, 2));
+      const { foodVsNutrition, accumulatedNutrition, foodVsDbItem } =
+        matchesMap;
+      setResponse(
+        JSON.stringify({ ...foodVsNutrition, accumulatedNutrition }, null, 2)
+      );
+
+      void createFoodLogEntry({
+        logDate: new Date().toISOString().split("T")[0],
+        items: Object.entries(foodVsNutrition).map(([foodName, nutrition]) => ({
+          name: foodName,
+          ...nutrition,
+          id: foodVsDbItem[foodName].id,
+          category: foodVsDbItem[foodName].category,
+        })),
+        calories: accumulatedNutrition.calories,
+        protein: accumulatedNutrition.protein,
+        carbs: accumulatedNutrition.carbs,
+        fat: accumulatedNutrition.fat,
+
+        // @todo: derive meal type from user's time of the day
+        mealType: "lunch", // assuming lunch for now
+      });
     } catch (error) {
       setResponse(
         `Error: ${error instanceof Error ? error.message : "Unknown error"}`

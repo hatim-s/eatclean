@@ -29,12 +29,26 @@ export type CalculatedNutrition = {
   vitaminB12: number;
 };
 
+function assertTypeNumberOrZero<T extends Record<string, unknown>>(
+  obj: T
+): Record<keyof T, number> {
+  return Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => {
+      const valueAsNumber = Number(value);
+      if (isNaN(valueAsNumber)) {
+        return [key, 0];
+      }
+      return [key, valueAsNumber];
+    })
+  ) as Record<keyof T, number>;
+}
+
 export function calculateNutritionFromPortion(
   food: FoodItem,
   portionGrams: number
 ): CalculatedNutrition {
   const multiplier = portionGrams / 100; // Nutrients are per 100g
-  return {
+  return assertTypeNumberOrZero({
     calories: food.calories * multiplier,
     protein: food.protein * multiplier,
     carbs: food.carbs * multiplier,
@@ -61,5 +75,5 @@ export function calculateNutritionFromPortion(
     vitaminB6: food.vitaminB6 * multiplier,
     vitaminB9: food.vitaminB9 * multiplier,
     vitaminB12: food.vitaminB12 * multiplier,
-  };
+  });
 }
