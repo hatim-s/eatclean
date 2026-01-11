@@ -6,11 +6,11 @@ import { foods } from "../db/schema";
 import {
   getEmbeddings as getVoyageEmbeddings,
   serializeEmbedding as serializeVoyageEmbedding,
-} from "../actions/ai/voyage";
+} from "../actions/embeddings/voyage";
 import {
   getEmbeddings as getCohereEmbeddings,
   serializeEmbedding as serializeCohereEmbedding,
-} from "../actions/ai/cohere";
+} from "../actions/embeddings/cohere";
 import { eq, isNull } from "drizzle-orm";
 
 const getBatchSize = (provider: "cohere" | "voyage") => {

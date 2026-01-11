@@ -3,8 +3,8 @@ import {
   ChatCompletionCreateParamsBase,
   ChatCompletionMessageParam,
 } from "groq-sdk/resources/chat/completions.mjs";
-import { getMessagesWithSystemPrompt } from "./prompt";
-import { DEFAULT_MODEL } from "./constants";
+import { getMessagesWithSystemPrompt } from "../lib/getMessagesWithSystemPrompt";
+import { DEFAULT_MODEL } from "../constants";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 

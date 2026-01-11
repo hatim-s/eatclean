@@ -18,10 +18,9 @@ export function FoodEntryForm() {
     setResponse("");
     try {
       const matchesMap = await createFoodLog(input);
-      console.log(matchesMap);
 
-      const { foodVsNutrition } = matchesMap;
-      setResponse(JSON.stringify(foodVsNutrition, null, 2));
+      const { foodVsNutrition, accumulatedNutrition } = matchesMap;
+      setResponse(JSON.stringify({ ...foodVsNutrition, accumulatedNutrition }, null, 2));
     } catch (error) {
       setResponse(
         `Error: ${error instanceof Error ? error.message : "Unknown error"}`
