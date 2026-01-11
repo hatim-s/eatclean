@@ -29,6 +29,7 @@ export async function createFoodLog(userInput: string) {
       // foodVsAllMatches: {} as Record<string, FoodItem[]>,
       foodVsNutrition: {} as Record<string, CalculatedNutrition>,
       accumulatedNutrition: {} as CalculatedNutrition,
+      foodVsDbItem: {} as Record<string, FoodItem>,
     };
   }
 
@@ -91,7 +92,9 @@ export async function createFoodLog(userInput: string) {
     foodVsNutrition[foodName] = nutrition;
   }
 
-  const accumulatedNutrition = accumulateNutrition(Object.values(foodVsNutrition));
+  const accumulatedNutrition = accumulateNutrition(
+    Object.values(foodVsNutrition)
+  );
 
   // Step 5: Return the results
   return {
@@ -99,5 +102,15 @@ export async function createFoodLog(userInput: string) {
     // foodVsAllMatches,
     foodVsNutrition,
     accumulatedNutrition,
+    foodVsDbItem: Object.fromEntries(
+      Object.entries(foodVsMatches).map(([foodName, match]) => [
+        foodName,
+        {
+          id: match.id,
+          name: match.name,
+          category: match.category,
+        },
+      ])
+    ),
   };
 }

@@ -38,7 +38,6 @@ export async function getEmbeddings(
         model: EMBEDDING_MODEL,
         inputType,
       });
-      // console.log(response);
     } catch (error) {
       console.error(
         `Error generating embeddings for batch starting at ${i}:`,
