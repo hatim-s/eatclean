@@ -96,8 +96,6 @@ export async function createFoodLog(userInput: string) {
     Object.values(foodVsNutrition)
   );
 
-  console.log(foodVsMatches);
-
   // Step 5: Return the results
   return {
     // foodVsMatches,
