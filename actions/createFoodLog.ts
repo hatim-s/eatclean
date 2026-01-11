@@ -51,7 +51,7 @@ export async function createFoodLog(userInput: string) {
   // Step 3: AI-based best match selection for each food name
   // currently pick the first item
   const foodVsMatches: Record<string, FoodItem> = {};
-  const foodVsAllMatches: Record<string, FoodItem[]> = {};
+  // const foodVsAllMatches: Record<string, FoodItem[]> = {};
   const candidateEntries = Object.entries(foodVsCandidates);
   const matchPromises = candidateEntries.map(([foodName, candidates]) =>
     selectBestMatch(foodName, candidates).then((bestCandidateId) => ({
@@ -73,7 +73,7 @@ export async function createFoodLog(userInput: string) {
           console.warn(`Best candidate not found for food name: ${foodName}`);
         }
       }
-      foodVsAllMatches[foodName] = candidates;
+      // foodVsAllMatches[foodName] = candidates;
     } else {
       console.warn(`Best match selection failed:`, result.reason);
     }
@@ -92,7 +92,7 @@ export async function createFoodLog(userInput: string) {
   // Step 5: Return the results
   return {
     foodVsMatches,
-    foodVsAllMatches,
+    // foodVsAllMatches,
     foodVsNutrition,
   };
 }

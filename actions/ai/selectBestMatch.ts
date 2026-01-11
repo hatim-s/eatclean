@@ -2,6 +2,7 @@
 
 import { FoodItem } from "@/types/db";
 import { getGroqChatCompletion } from "./completion";
+import { buildBestMatchPrompt } from "@/actions/lib/buildBestMatchPrompt";
 
 const BEST_MATCH_SYSTEM_PROMPT = `You are a nutrition database matcher. Given a user's food search term and a list of candidate foods from a database, select the single best match.
 
@@ -34,12 +35,7 @@ export async function selectBestMatch(
     .map((c, i) => `${i + 1}. "${c.name}" (Category: ${c.category})`)
     .join("\n");
 
-  const userPrompt = `User searched for: "${searchTerm}"
-
-Candidates:
-${candidateList}
-
-Which number is the best match?`;
+  const userPrompt = buildBestMatchPrompt(searchTerm, candidateList);
 
   const response = await getGroqChatCompletion(
     [
