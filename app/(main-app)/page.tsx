@@ -1,15 +1,10 @@
-import { FoodEntryForm } from "./components/FoodEntryForm";
+import { LandingCalendar } from "./components/LandingCalendar";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center font-sans">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-background sm:items-start">
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left w-full">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            Food Entry
-          </h1>
-          <FoodEntryForm />
-        </div>
+    <div className="flex h-screen items-center justify-center font-sans dark">
+      <main className="flex h-screen w-full flex-col items-center justify-between bg-background p-16">
+        <LandingCalendar />
       </main>
     </div>
   );

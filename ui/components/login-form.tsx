@@ -1,5 +1,4 @@
 import { cn } from "@/ui/lib/utils";
-import { Button } from "@/ui/components/base/button";
 import {
   Card,
   CardContent,
@@ -16,27 +15,24 @@ import {
 type LoginFormProps = {
   formHeader: string;
   formDescription?: string;
-} & React.ComponentProps<"div">
+} & React.ComponentProps<"div">;
 
 export function LoginForm(props: LoginFormProps) {
-  const { formHeader, formDescription, className, children, ...restProps } = props;
+  const { formHeader, formDescription, className, children, ...restProps } =
+    props;
   return (
     <div className={cn("flex flex-col gap-6", className)} {...restProps}>
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">{formHeader}</CardTitle>
-          {formDescription ?
-            <CardDescription>
-              {formDescription}
-            </CardDescription>
-            : null}
+          {formDescription ? (
+            <CardDescription>{formDescription}</CardDescription>
+          ) : null}
         </CardHeader>
         <CardContent>
           <form>
             <FieldGroup>
-              <Field>
-                {children}
-              </Field>
+              <Field>{children}</Field>
 
               {/* separator */}
               {/* <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">

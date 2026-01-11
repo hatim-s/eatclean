@@ -11,6 +11,8 @@
     "prefix": ""
   },
   "iconLibrary": "lucide",
+  "menuColor": "default",
+  "menuAccent": "bold",
   "aliases": {
     "components": "@/ui/components",
     "utils": "@/ui/lib/utils",
@@ -18,7 +20,7 @@
     "lib": "@/ui/lib",
     "hooks": "@/ui/hooks"
   },
-  "menuColor": "default",
-  "menuAccent": "bold",
-  "registries": {}
+  "registries": {
+    "@kibo-ui": "https://www.kibo-ui.com/r/{name}.json"
+  }
 }
