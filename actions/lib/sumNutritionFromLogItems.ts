@@ -1,5 +1,3 @@
-"use server";
-
 import { FoodLog as FoodLogType } from "@/types/db";
 import { accumulateNutrition } from "./accumulateNutrition";
 import { CalculatedNutrition } from "./calculateNutritionFromPortion";

@@ -139,23 +139,38 @@ export async function recalculateDailySummary(
     // Calculate totals from all items
     const totals = sumNutritionFromLogItems(dayLogs);
 
-    // Upsert summary
-    const [summary] = await tx
-      .insert(dailySummary)
-      .values({
-        userId,
-        date,
-        ...totals,
-        updatedAt: new Date(),
-      })
-      .onConflictDoUpdate({
-        target: [dailySummary.userId, dailySummary.date],
-        set: {
+    // Upsert summary - check if exists first
+    const [existing] = await tx
+      .select()
+      .from(dailySummary)
+      .where(and(eq(dailySummary.userId, userId), eq(dailySummary.date, date)))
+      .limit(1);
+
+    let summary: DailySummary;
+    if (existing) {
+      const [updated] = await tx
+        .update(dailySummary)
+        .set({
           ...totals,
           updatedAt: new Date(),
-        },
-      })
-      .returning();
+        })
+        .where(
+          and(eq(dailySummary.userId, userId), eq(dailySummary.date, date))
+        )
+        .returning();
+      summary = updated;
+    } else {
+      const [inserted] = await tx
+        .insert(dailySummary)
+        .values({
+          userId,
+          date,
+          ...totals,
+          updatedAt: new Date(),
+        })
+        .returning();
+      summary = inserted;
+    }
 
     return summary;
   });

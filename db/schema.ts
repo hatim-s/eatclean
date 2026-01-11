@@ -134,7 +134,9 @@ export const foodLog = sqliteTable(
     // The food items array as JSON
     items: text("items", { mode: "json" })
       .notNull()
-      .$type<InferSelectModel<typeof foods>[]>(),
+      .$type<
+        Omit<InferSelectModel<typeof foods>, "embedding" | "dataSource">[]
+      >(),
 
     // Denormalized totals for this log entry (avoids re-summing JSON)
     calories: real("calories").notNull().default(0),
