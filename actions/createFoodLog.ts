@@ -9,6 +9,7 @@ import {
   CalculatedNutrition,
   calculateNutritionFromPortion,
 } from "./lib/calculateNutritionFromPortion";
+import { accumulateNutrition } from "./lib/accumulateNutrition";
 
 export type FoodLogResult = {
   entry: FoodWithPortionEntry;
@@ -24,9 +25,10 @@ export async function createFoodLog(userInput: string) {
 
   if (!Array.isArray(foodLog) || foodLog.length === 0) {
     return {
-      foodVsMatches: {} as Record<string, FoodItem>,
-      foodVsAllMatches: {} as Record<string, FoodItem[]>,
+      // foodVsMatches: {} as Record<string, FoodItem>,
+      // foodVsAllMatches: {} as Record<string, FoodItem[]>,
       foodVsNutrition: {} as Record<string, CalculatedNutrition>,
+      accumulatedNutrition: {} as CalculatedNutrition,
     };
   }
 
@@ -89,10 +91,13 @@ export async function createFoodLog(userInput: string) {
     foodVsNutrition[foodName] = nutrition;
   }
 
+  const accumulatedNutrition = accumulateNutrition(Object.values(foodVsNutrition));
+
   // Step 5: Return the results
   return {
-    foodVsMatches,
+    // foodVsMatches,
     // foodVsAllMatches,
     foodVsNutrition,
+    accumulatedNutrition,
   };
 }
