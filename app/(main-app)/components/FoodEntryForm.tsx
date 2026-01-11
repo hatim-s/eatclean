@@ -19,7 +19,6 @@ export function FoodEntryForm() {
     setResponse("");
     try {
       const matchesMap = await createFoodLog(input);
-      console.log(matchesMap);
 
       const { foodVsNutrition, accumulatedNutrition, foodVsDbItem } =
         matchesMap;
