@@ -545,23 +545,23 @@ const CalendarItem = memo(({ feature, className }: CalendarItemProps) => {
   return (
     <div className={cn("flex flex-col gap-1.5 px-4 py-2", className)}>
       <div className="flex flex-row gap-2 items-center">
-        <div className="h-2 w-2 shrink-0 rounded-full bg-purple-400" />
+        <div className="h-2 w-2 shrink-0 rounded-full bg-purple-500 dark:bg-purple-400" />
         <span className="truncate">{feature.calories}</span>
       </div>
 
       <div className="flex flex-row gap-2 items-center flex-wrap">
         <span className="flex flex-row gap-2 items-center">
-          <div className="h-2 w-2 shrink-0 rounded-full bg-green-400" />
+          <div className="h-2 w-2 shrink-0 rounded-full bg-green-500 dark:bg-green-400" />
           {feature.protein}
         </span>
 
         <span className="flex flex-row gap-2 items-center">
-          <div className="h-2 w-2 shrink-0 rounded-full bg-yellow-400" />
+          <div className="h-2 w-2 shrink-0 rounded-full bg-yellow-500 dark:bg-yellow-400" />
           {feature.carbs}
         </span>
 
         <span className="flex flex-row gap-2 items-center">
-          <div className="h-2 w-2 shrink-0 rounded-full bg-red-400" />
+          <div className="h-2 w-2 shrink-0 rounded-full bg-red-500 dark:bg-red-400" />
           {feature.fat}
         </span>
       </div>

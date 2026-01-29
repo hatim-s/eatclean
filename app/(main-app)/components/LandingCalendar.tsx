@@ -91,20 +91,20 @@ function LandingCalendar({ summaries }: { summaries: DailySummary[] }) {
               className={cn(
                 "size-full h-32 p-1.5 sm:p-2 rounded-xl border transition-all text-left flex flex-col",
                 isToday
-                  ? "border-emerald-500/50 bg-emerald-500/10"
-                  : "border-zinc-800 hover:border-zinc-700 bg-zinc-900/50"
+                  ? "border-emerald-500/50 dark:border-emerald-400/50 bg-emerald-500/10 dark:bg-emerald-400/10"
+                  : "border-border hover:border-primary/50 bg-card/10"
               )}
             >
               <span
                 className={cn(
                   "text-xs sm:text-sm font-medium",
-                  isToday ? "text-emerald-400" : "text-zinc-400"
+                  isToday ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"
                 )}
               >
                 {day}
               </span>
               <div className="flex-1 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                <Plus size={16} className="text-zinc-600" />
+                <Plus size={16} className="text-muted-foreground" />
               </div>
             </button>
           );
@@ -120,17 +120,17 @@ function LandingCalendar({ summaries }: { summaries: DailySummary[] }) {
         )}
       </CalendarBody>
 
-      <div className="flex items-center justify-center gap-6 mt-6 text-xs text-zinc-500">
+      <div className="flex items-center justify-center gap-6 mt-6 text-xs text-muted-foreground">
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-1 bg-emerald-500 rounded-full" />
+          <div className="w-3 h-1 bg-emerald-500 dark:bg-emerald-400 rounded-full" />
           <span>Protein</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-1 bg-amber-500 rounded-full" />
+          <div className="w-3 h-1 bg-amber-500 dark:bg-amber-400 rounded-full" />
           <span>Carbs</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-1 bg-rose-500 rounded-full" />
+          <div className="w-3 h-1 bg-rose-500 dark:bg-rose-400 rounded-full" />
           <span>Fat</span>
         </div>
       </div>

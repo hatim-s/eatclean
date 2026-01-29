@@ -5,7 +5,7 @@ export default async function Home() {
   const summaries = await getMonthlySummary(new Date());
 
   return (
-    <div className="flex h-screen items-center justify-center font-sans dark">
+    <div className="flex h-screen items-center justify-center font-sans">
       <main className="flex h-screen w-full flex-col items-center justify-between bg-background p-16 max-w-300">
         <LandingCalendar summaries={summaries} />
       </main>
