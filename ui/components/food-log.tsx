@@ -4,7 +4,7 @@ import { memo } from "react";
 
 type NutritionType = keyof Omit<
   DailySummary,
-  "id" | "userId" | "date" | "updatedAt"
+  "id" | "userId" | "date" | "updatedAt" | "foodItems"
 >;
 type FoodLogItemProps = {
   size: "sm" | "md";

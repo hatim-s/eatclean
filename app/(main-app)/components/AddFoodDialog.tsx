@@ -75,7 +75,7 @@ export function AddFoodDialog({ date }: AddFoodDialogProps) {
       }
 
       const matchesMap = await createFoodLog(input);
-      const { foodVsNutrition, accumulatedNutrition, foodVsDbItem } = matchesMap;
+      const { foodVsNutrition, accumulatedNutrition, foodVsDbItem, foodVsQuantityGms } = matchesMap;
 
       if (Object.keys(foodVsNutrition).length === 0) {
         setError("No foods found. Please try a different description.");
@@ -89,6 +89,7 @@ export function AddFoodDialog({ date }: AddFoodDialogProps) {
           ...nutrition,
           id: foodVsDbItem[foodName].id,
           category: foodVsDbItem[foodName].category,
+          quantity_gms: foodVsQuantityGms[foodName],
         })),
         calories: accumulatedNutrition.calories,
         protein: accumulatedNutrition.protein,

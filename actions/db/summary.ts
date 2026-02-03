@@ -3,7 +3,7 @@
 import { db, dailySummary, foodLog } from "@/db";
 import { getSession } from "@/auth/session";
 import { eq, and, gte, lte, asc } from "drizzle-orm";
-import { DailySummary } from "@/types/db";
+import { DailySummary, FoodItem } from "@/types/db";
 import { sumNutritionFromLogItems } from "../lib/sumNutritionFromLogItems";
 import {
   startOfWeek,
@@ -13,6 +13,10 @@ import {
   format,
   parseISO,
 } from "date-fns";
+
+type FoodLogItemWithQuantity = Omit<FoodItem, "embedding" | "dataSource"> & {
+  quantity_gms: number;
+};
 
 export async function getDailySummary(
   date: string
@@ -139,6 +143,15 @@ export async function recalculateDailySummary(
     // Calculate totals from all items
     const totals = sumNutritionFromLogItems(dayLogs);
 
+    // Extract food items with name and quantity
+    const foodItems = dayLogs.flatMap((log) =>
+      (log.items as FoodLogItemWithQuantity[]).map((item) => ({
+        food_id: item.id,
+        food_name: item.name,
+        quantity_gms: Math.round(item.quantity_gms || 0),
+      }))
+    );
+
     // Upsert summary - check if exists first
     const [existing] = await tx
       .select()
@@ -152,6 +165,7 @@ export async function recalculateDailySummary(
         .update(dailySummary)
         .set({
           ...totals,
+          foodItems,
           updatedAt: new Date(),
         })
         .where(
@@ -166,6 +180,7 @@ export async function recalculateDailySummary(
           userId,
           date,
           ...totals,
+          foodItems,
           updatedAt: new Date(),
         })
         .returning();

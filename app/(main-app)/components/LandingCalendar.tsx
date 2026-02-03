@@ -54,6 +54,7 @@ function LandingCalendar({ summaries }: { summaries: DailySummary[] }) {
         vitaminB6: Math.round(summary.vitaminB6),
         vitaminB9: Math.round(summary.vitaminB9),
         vitaminB12: Math.round(summary.vitaminB12),
+        foodItems: summary.foodItems || [],
       })),
     [summaries]
   );

@@ -105,6 +105,7 @@ type Feature = {
   vitaminB6: number;
   vitaminB9: number;
   vitaminB12: number;
+  foodItems?: Array<{ food_id: number; food_name: string; quantity_gms: number }>;
 };
 
 type ComboboxProps = {

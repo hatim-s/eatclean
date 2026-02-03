@@ -44,7 +44,9 @@ export function FoodLogDialog({
   date,
   isToday,
 }: {
-  foodLog: Feature;
+  foodLog: Feature & {
+    foodItems?: Array<{ food_id: number; food_name: string; quantity_gms: number }>;
+  };
   date: Date;
   isToday: boolean;
 }) {
@@ -315,6 +317,29 @@ export function FoodLogDialog({
                     ))}
                   </div>
                 </div>
+
+                {foodLog.foodItems && foodLog.foodItems.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-2">
+                      Foods Consumed
+                    </h3>
+                    <div className="space-y-1">
+                      {foodLog.foodItems.map((item, index) => (
+                        <div
+                          key={`${item.food_id}-${index}`}
+                          className="flex justify-between items-center py-1.5 px-3 bg-secondary/30 rounded-lg"
+                        >
+                          <span className="text-sm text-foreground">
+                            {item.food_name.charAt(0).toUpperCase() + item.food_name.slice(1)}
+                          </span>
+                          <span className="text-sm font-medium text-muted-foreground">
+                            {item.quantity_gms}g
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </ScrollArea>

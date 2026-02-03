@@ -3,12 +3,14 @@
 import { db, foodLog, dailySummary } from "@/db";
 import { getSession } from "@/auth/session";
 import { eq, and, asc } from "drizzle-orm";
-import { NewFoodLog, FoodLog as FoodLogType } from "@/types/db";
+import { NewFoodLog, FoodLog as FoodLogType, FoodItem } from "@/types/db";
 import { sumNutritionFromLogItems } from "../lib/sumNutritionFromLogItems";
 
-export async function createFoodLogEntry(
-  data: Omit<NewFoodLog, "userId" | "id" | "createdAt">
-): Promise<FoodLogType> {
+type FoodLogItemWithQuantity = Omit<FoodItem, "embedding" | "dataSource"> & {
+  quantity_gms: number;
+};
+
+export async function createFoodLogEntry(data: Omit<NewFoodLog, "userId" | "id" | "createdAt">): Promise<FoodLogType> {
   const session = await getSession();
   if (!session?.user) {
     throw new Error("Unauthorized");
@@ -37,6 +39,15 @@ export async function createFoodLogEntry(
       // Calculate totals from all items in all logs
       const totals = sumNutritionFromLogItems(dayLogs);
 
+      // Extract food items with name and quantity
+      const foodItems = dayLogs.flatMap((log) =>
+        (log.items as FoodLogItemWithQuantity[]).map((item) => ({
+          food_id: item.id,
+          food_name: item.name,
+          quantity_gms: Math.round(item.quantity_gms || 0),
+        }))
+      );
+
       // Upsert daily summary
       // Check if summary exists first, then update or insert
       const [existing] = await tx
@@ -52,6 +63,7 @@ export async function createFoodLogEntry(
           .update(dailySummary)
           .set({
             ...totals,
+            foodItems,
             updatedAt: new Date(),
           })
           .where(
@@ -62,6 +74,7 @@ export async function createFoodLogEntry(
           userId,
           date: logDate,
           ...totals,
+          foodItems,
           updatedAt: new Date(),
         });
       }
@@ -147,6 +160,15 @@ export async function deleteFoodLog(id: string): Promise<void> {
       // Recalculate totals
       const totals = sumNutritionFromLogItems(dayLogs);
 
+      // Extract food items with name and quantity
+      const foodItems = dayLogs.flatMap((log) =>
+        (log.items as FoodLogItemWithQuantity[]).map((item) => ({
+          food_id: item.id,
+          food_name: item.name,
+          quantity_gms: Math.round(item.quantity_gms || 0),
+        }))
+      );
+
       // Update summary - check if exists first
       const [existing] = await tx
         .select()
@@ -161,6 +183,7 @@ export async function deleteFoodLog(id: string): Promise<void> {
           .update(dailySummary)
           .set({
             ...totals,
+            foodItems,
             updatedAt: new Date(),
           })
           .where(
@@ -171,6 +194,7 @@ export async function deleteFoodLog(id: string): Promise<void> {
           userId,
           date: logDate,
           ...totals,
+          foodItems,
           updatedAt: new Date(),
         });
       }

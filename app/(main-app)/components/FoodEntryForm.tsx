@@ -20,7 +20,7 @@ export function FoodEntryForm() {
     try {
       const matchesMap = await createFoodLog(input);
 
-      const { foodVsNutrition, accumulatedNutrition, foodVsDbItem } =
+      const { foodVsNutrition, accumulatedNutrition, foodVsDbItem, foodVsQuantityGms } =
         matchesMap;
       setResponse(
         JSON.stringify({ ...foodVsNutrition, accumulatedNutrition }, null, 2)
@@ -33,13 +33,14 @@ export function FoodEntryForm() {
           ...nutrition,
           id: foodVsDbItem[foodName].id,
           category: foodVsDbItem[foodName].category,
+          quantity_gms: foodVsQuantityGms[foodName],
         })),
         calories: accumulatedNutrition.calories,
         protein: accumulatedNutrition.protein,
         carbs: accumulatedNutrition.carbs,
         fat: accumulatedNutrition.fat,
 
-        // @todo: derive meal type from user's time of the day
+        // @todo: derive meal type from user's time of day
         mealType: "lunch", // assuming lunch for now
       });
     } catch (error) {

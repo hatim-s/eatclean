@@ -135,7 +135,11 @@ export const foodLog = sqliteTable(
     items: text("items", { mode: "json" })
       .notNull()
       .$type<
-        Omit<InferSelectModel<typeof foods>, "embedding" | "dataSource">[]
+        Array<
+          Omit<InferSelectModel<typeof foods>, "embedding" | "dataSource"> & {
+            quantity_gms: number;
+          }
+        >
       >(),
 
     // Denormalized totals for this log entry (avoids re-summing JSON)
@@ -166,6 +170,10 @@ export const dailySummary = sqliteTable(
 
     // Aggregated totals
     ...nutritionColumnDefinitions,
+
+    // Food items consumed: [{ food_id, food_name, quantity_gms }]
+    foodItems: text("food_items", { mode: "json" })
+      .$type<Array<{ food_id: number; food_name: string; quantity_gms: number }>>(),
 
     // Track when last updated
     updatedAt: integer("updated_at", { mode: "timestamp" })
