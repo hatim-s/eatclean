@@ -124,7 +124,7 @@ export function FoodLogDialog({
     <MorphingDialog transition={transition}>
       <MorphingDialogTrigger className="w-full h-full">
         <div
-          className={`overflow-hidden p-1.5 sm:p-2 rounded-xl border transition-all text-left flex flex-col h-full
+          className={`overflow-hidden p-1.5 sm:p-2 rounded-xl border transition-all text-left flex flex-col aspect-square
         ${isToday
               ? "border-emerald-500/50 dark:border-emerald-400/50 bg-emerald-500/10 dark:bg-emerald-400/10"
               : "border-border hover:border-primary/50 bg-card/50"

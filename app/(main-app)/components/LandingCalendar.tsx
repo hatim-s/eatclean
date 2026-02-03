@@ -1,7 +1,5 @@
 "use client";
 
-import { Plus } from "lucide-react";
-
 import {
   CalendarBody,
   CalendarDate,
@@ -13,8 +11,9 @@ import {
   CalendarYearPicker,
 } from "@/ui/components/calendar";
 import { FoodLogDialog } from "./FoodLogDialog";
+import { AddFoodDialog } from "./AddFoodDialog";
 import { DailySummary } from "@/types/db";
-import { parseISO, isSameDay } from "date-fns";
+import { parseISO, isSameDay, format } from "date-fns";
 import { useMemo } from "react";
 import { cn } from "@/ui/lib/utils";
 
@@ -74,6 +73,8 @@ function LandingCalendar({ summaries }: { summaries: DailySummary[] }) {
         className="border-none"
         renderDay={({ day, date, features, isToday }) => {
           const feature = features[0];
+          const dateStr = format(date, "yyyy-MM-dd");
+
           if (feature) {
             return (
               <FoodLogDialog
@@ -86,10 +87,10 @@ function LandingCalendar({ summaries }: { summaries: DailySummary[] }) {
           }
 
           return (
-            <button
+            <div
               key={day}
               className={cn(
-                "size-full h-32 p-1.5 sm:p-2 rounded-xl border transition-all text-left flex flex-col",
+                "aspect-square w-full p-1.5 sm:p-2 rounded-xl border transition-all text-left flex flex-col",
                 isToday
                   ? "border-emerald-500/50 dark:border-emerald-400/50 bg-emerald-500/10 dark:bg-emerald-400/10"
                   : "border-border hover:border-primary/50 bg-card/10"
@@ -103,10 +104,8 @@ function LandingCalendar({ summaries }: { summaries: DailySummary[] }) {
               >
                 {day}
               </span>
-              <div className="flex-1 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                <Plus size={16} className="text-muted-foreground" />
-              </div>
-            </button>
+              <AddFoodDialog date={dateStr} />
+            </div>
           );
         }}
       >
