@@ -33,7 +33,7 @@ export async function parseUserEntry(userEntry: string) {
     responseJson = JSON.parse(response);
   } catch (error) {
     console.error("Failed to parse JSON:", error);
-    // throw new Error("Failed to parse JSON");
+    throw new Error("Failed to parse JSON", { cause: error });
   }
   return responseJson;
 }

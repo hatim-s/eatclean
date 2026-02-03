@@ -29,6 +29,8 @@ export async function createFoodLog(userInput: string) {
       // foodVsAllMatches: {} as Record<string, FoodItem[]>,
       foodVsNutrition: {} as Record<string, CalculatedNutrition>,
       accumulatedNutrition: {} as CalculatedNutrition,
+      foodVsDbItem: {} as Record<string, FoodItem>,
+      foodVsQuantityGms: {} as Record<string, number>,
     };
   }
 
@@ -83,15 +85,20 @@ export async function createFoodLog(userInput: string) {
 
   // Step 4: Calculate the nutrition for each food name
   const foodVsNutrition: Record<string, CalculatedNutrition> = {};
+  const foodVsQuantityGms: Record<string, number> = {};
   for (const [foodName, match] of Object.entries(foodVsMatches)) {
+    const quantityGms = foodLog.find((f) => f.food === foodName)?.portion_size_gms || 0;
+    foodVsQuantityGms[foodName] = quantityGms;
     const nutrition = calculateNutritionFromPortion(
       match,
-      foodLog.find((f) => f.food === foodName)?.portion_size_gms || 0
+      quantityGms
     );
     foodVsNutrition[foodName] = nutrition;
   }
 
-  const accumulatedNutrition = accumulateNutrition(Object.values(foodVsNutrition));
+  const accumulatedNutrition = accumulateNutrition(
+    Object.values(foodVsNutrition)
+  );
 
   // Step 5: Return the results
   return {
@@ -99,5 +106,16 @@ export async function createFoodLog(userInput: string) {
     // foodVsAllMatches,
     foodVsNutrition,
     accumulatedNutrition,
+    foodVsDbItem: Object.fromEntries(
+      Object.entries(foodVsMatches).map(([foodName, match]) => [
+        foodName,
+        {
+          id: match.id,
+          name: match.name,
+          category: match.category,
+        },
+      ])
+    ),
+    foodVsQuantityGms,
   };
 }
