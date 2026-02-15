@@ -42,9 +42,11 @@ interface ManualItem {
 
 interface AddFoodDialogProps {
   date: string;
+  hideTrigger?: boolean;
+  onSuccess?: () => void;
 }
 
-export function AddFoodDialog({ date }: AddFoodDialogProps) {
+export function AddFoodDialog({ date, hideTrigger, onSuccess }: AddFoodDialogProps) {
   const router = useRouter();
   const [mode, setMode] = useState<"ai" | "manual">("ai");
   const [prompt, setPrompt] = useState("");
@@ -98,7 +100,10 @@ export function AddFoodDialog({ date }: AddFoodDialogProps) {
         mealType,
       });
 
+      onSuccess?.();
       router.refresh();
+      setPrompt("");
+      setManualItems([{ food: "", quantity: "" }]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to log food. Please try again.");
     } finally {
@@ -118,11 +123,13 @@ export function AddFoodDialog({ date }: AddFoodDialogProps) {
 
   return (
     <MorphingDialog>
-      <MorphingDialogTrigger className="w-full flex-1">
-        <div className="flex-1 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-          <Plus size={16} className="text-muted-foreground" />
-        </div>
-      </MorphingDialogTrigger>
+      {!hideTrigger && (
+        <MorphingDialogTrigger className="w-full flex-1">
+          <div className="flex-1 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+            <Plus size={16} className="text-muted-foreground" />
+          </div>
+        </MorphingDialogTrigger>
+      )}
       <MorphingDialogContainer>
         <MorphingDialogContent className="bg-card border border-border rounded-2xl w-full max-w-md overflow-hidden flex flex-col">
           <div className="p-4 border-b border-border flex items-center justify-between">

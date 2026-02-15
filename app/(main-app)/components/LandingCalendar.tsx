@@ -10,7 +10,7 @@ import {
   CalendarProvider,
   CalendarYearPicker,
 } from "@/ui/components/calendar";
-import { FoodLogDialog } from "./FoodLogDialog";
+import { FoodLogDialogWrapper } from "./FoodLogDialogWrapper";
 import { AddFoodDialog } from "./AddFoodDialog";
 import { DailySummary } from "@/types/db";
 import { parseISO, isSameDay, format } from "date-fns";
@@ -78,7 +78,7 @@ function LandingCalendar({ summaries }: { summaries: DailySummary[] }) {
 
           if (feature) {
             return (
-              <FoodLogDialog
+              <FoodLogDialogWrapper
                 key={day}
                 foodLog={feature}
                 date={date}
@@ -111,7 +111,7 @@ function LandingCalendar({ summaries }: { summaries: DailySummary[] }) {
         }}
       >
         {({ feature }) => (
-          <FoodLogDialog
+          <FoodLogDialogWrapper
             foodLog={feature}
             key={feature.id}
             date={feature.date}
