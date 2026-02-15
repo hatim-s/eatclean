@@ -2,7 +2,7 @@
 
 import { db, foodLog, dailySummary } from "@/db";
 import { getSession } from "@/auth/session";
-import { eq, and, asc } from "drizzle-orm";
+import { eq, and, asc, desc } from "drizzle-orm";
 import { NewFoodLog, FoodLog as FoodLogType, FoodItem } from "@/types/db";
 import { sumNutritionFromLogItems } from "../lib/sumNutritionFromLogItems";
 
@@ -116,6 +116,22 @@ export async function getFoodLogsByDate(
     .from(foodLog)
     .where(and(eq(foodLog.userId, session.user.id), eq(foodLog.logDate, date)))
     .orderBy(asc(foodLog.createdAt));
+}
+
+export async function getRecentFoodLogs(limit = 5): Promise<FoodLogType[]> {
+  const session = await getSession();
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const safeLimit = Math.max(1, Math.min(50, Math.floor(limit)));
+
+  return await db
+    .select()
+    .from(foodLog)
+    .where(eq(foodLog.userId, session.user.id))
+    .orderBy(desc(foodLog.createdAt))
+    .limit(safeLimit);
 }
 
 export async function deleteFoodLog(id: string): Promise<void> {

@@ -364,7 +364,7 @@ const CalendarBody = memo(
     }
 
     return (
-      <div className={cn("grid grow grid-cols-7 gap-1 sm:gap-2", className)}>
+      <div className={cn("grid grid-cols-7 auto-rows-[1fr] gap-1 sm:gap-2", className)}>
         {days.map((day, index) => (
           <div
             className={cn(
