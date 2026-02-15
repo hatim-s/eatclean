@@ -1,9 +1,9 @@
-import { LandingCalendar } from "../components/LandingCalendar";
+import { LandingCalendar } from "@/components/LandingCalendar";
 import { getMonthlySummary, getWeeklySummary } from "@/actions/db/summary";
 import { getRecentFoodLogs } from "@/actions/db/foodLog";
 import { getSession } from "@/auth/session";
 import { Leaf } from "lucide-react";
-import { UserMenu } from "../components/UserMenu";
+import { UserMenu } from "@/components/UserMenu";
 
 function getUserInitials(
   name: string | null | undefined,
