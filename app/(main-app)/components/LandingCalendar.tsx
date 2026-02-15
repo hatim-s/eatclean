@@ -65,6 +65,13 @@ type WeeklyDayStat = {
   isElapsed: boolean;
 };
 
+type WeeklyMetrics = {
+  days: WeeklyDayStat[];
+  weeklyAverage: number;
+  weeklyTarget: number;
+  isWeeklyTargetMet: boolean;
+};
+
 type LandingCalendarProps = {
   summaries: DailySummary[];
   weeklySummaries: DailySummary[];
@@ -94,25 +101,64 @@ function getRecentMealTitle(entry: FoodLog) {
   return items.length > 1 ? `${firstName} +${items.length - 1}` : firstName;
 }
 
+function getWeeklyMetrics(
+  summaries: DailySummary[],
+  today: Date = new Date()
+): WeeklyMetrics {
+  const weekStart = startOfWeek(today, { weekStartsOn: 1 });
+  const elapsedDays = Math.max(differenceInCalendarDays(today, weekStart) + 1, 1);
+
+  const summaryByDate = new Map(
+    summaries.map((summary) => [summary.date, Math.round(summary.calories)])
+  );
+
+  const days = Array.from({ length: 7 }, (_, index) => {
+    const date = addDays(weekStart, index);
+    const dateKey = format(date, "yyyy-MM-dd");
+    const calories = summaryByDate.get(dateKey) ?? 0;
+
+    return {
+      label: format(date, "EEE"),
+      dateKey,
+      calories,
+      isElapsed: index < elapsedDays,
+    };
+  });
+
+  const weeklyTotal = days
+    .filter((day) => day.isElapsed)
+    .reduce((sum, day) => sum + day.calories, 0);
+  const weeklyAverage = Math.round(weeklyTotal / elapsedDays);
+
+  return {
+    days,
+    weeklyAverage,
+    weeklyTarget: CALORIE_GOAL,
+    isWeeklyTargetMet: weeklyAverage <= CALORIE_GOAL,
+  };
+}
+
 function WeeklyWidget({
   days,
   weeklyAverage,
+  weeklyTarget,
   isWeeklyTargetMet,
 }: {
   days: WeeklyDayStat[];
   weeklyAverage: number;
+  weeklyTarget: number;
   isWeeklyTargetMet: boolean;
 }) {
-  const progressValue = Math.min((weeklyAverage / CALORIE_GOAL) * 100, 100);
+  const progressValue = Math.min((weeklyAverage / weeklyTarget) * 100, 100);
 
   return (
     <Card size="sm">
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-1.5">
         <div className="flex items-center justify-between gap-2">
-          <CardTitle>This Week</CardTitle>
+          <CardTitle className="text-sm">This Week</CardTitle>
           <Badge
             className={cn(
-              "gap-1 text-[10px]",
+              "h-5 gap-1 px-1.5 text-[10px]",
               isWeeklyTargetMet
                 ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
                 : "bg-amber-500/15 text-amber-700 dark:text-amber-300"
@@ -124,13 +170,13 @@ function WeeklyWidget({
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="grid grid-cols-7 gap-1">
+      <CardContent className="space-y-2.5">
+        <div className="grid grid-cols-7 gap-0.5">
           {days.map((day) => (
             <div
               key={day.dateKey}
               className={cn(
-                "rounded-md border px-1 py-1 text-center",
+                "rounded-md border px-0.5 py-1 text-center",
                 day.isElapsed
                   ? "border-border bg-muted/40"
                   : "border-border/60 border-dashed bg-transparent"
@@ -145,7 +191,7 @@ function WeeklyWidget({
         </div>
 
         <Progress className="gap-1" value={progressValue}>
-          <ProgressTrack className="h-1.5">
+          <ProgressTrack className="h-1">
             <ProgressIndicator
               className={cn(
                 isWeeklyTargetMet ? "bg-emerald-500" : "bg-amber-500"
@@ -154,9 +200,14 @@ function WeeklyWidget({
           </ProgressTrack>
         </Progress>
 
-        <Separator />
+        <Separator className="my-0" />
 
-        <div className="flex items-center justify-between text-xs">
+        <div className="flex items-center justify-between text-[11px]">
+          <span className="text-muted-foreground">Target</span>
+          <span className="font-medium tabular-nums">{weeklyTarget} kcal</span>
+        </div>
+
+        <div className="flex items-center justify-between text-[11px]">
           <span className="text-muted-foreground">Weekly avg</span>
           <span className="font-semibold tabular-nums">{weeklyAverage} kcal</span>
         </div>
@@ -199,32 +250,32 @@ function GoalsWidget() {
 
   return (
     <Card size="sm">
-      <CardHeader className="pb-2">
-        <CardTitle>Daily Goals</CardTitle>
+      <CardHeader className="pb-1.5">
+        <CardTitle className="text-sm">Daily Goals</CardTitle>
       </CardHeader>
       <CardContent>
-        <ItemGroup className="gap-1.5">
+        <ItemGroup className="gap-1">
           {goals.map((goal) => (
             <Item
               key={goal.label}
-              className="items-center rounded-lg border-transparent px-2.5 py-2"
+              className="items-center rounded-md border-transparent px-2 py-1.5"
               size="xs"
               variant="muted"
             >
               <ItemMedia
                 className={cn(
-                  "size-5 rounded-md flex items-center justify-center",
+                  "size-4 rounded-sm flex items-center justify-center",
                   goal.iconBg
                 )}
               >
-                <goal.icon className={cn("size-3.5", goal.iconText)} />
+                <goal.icon className={cn("size-3", goal.iconText)} />
               </ItemMedia>
               <ItemContent>
-                <ItemTitle className="text-xs font-medium">
+                <ItemTitle className="text-[11px] font-medium">
                   {goal.label}
                 </ItemTitle>
               </ItemContent>
-              <ItemActions className="ml-auto text-xs font-semibold tabular-nums">
+              <ItemActions className="ml-auto text-[11px] font-semibold tabular-nums">
                 {goal.value}
               </ItemActions>
             </Item>
@@ -238,16 +289,16 @@ function GoalsWidget() {
 function RecentMealsWidget({ recentMeals }: { recentMeals: FoodLog[] }) {
   return (
     <Card size="sm">
-      <CardHeader className="pb-2">
-        <CardTitle>Recent Meals</CardTitle>
+      <CardHeader className="pb-1.5">
+        <CardTitle className="text-sm">Recent Meals</CardTitle>
       </CardHeader>
       <CardContent>
         {recentMeals.length === 0 ? (
-          <p className="text-xs text-muted-foreground py-2">
+          <p className="py-2 text-xs text-muted-foreground">
             No recent meals yet.
           </p>
         ) : (
-          <ItemGroup className="gap-1.5">
+          <ItemGroup className="gap-1">
             {recentMeals.map((entry) => {
               const createdAt =
                 entry.createdAt instanceof Date
@@ -257,20 +308,20 @@ function RecentMealsWidget({ recentMeals }: { recentMeals: FoodLog[] }) {
               return (
                 <Item
                   key={entry.id}
-                  className="rounded-lg border-transparent px-2.5 py-2"
+                  className="rounded-md border-transparent px-2 py-1.5"
                   size="xs"
                   variant="muted"
                 >
                   <ItemContent>
-                    <ItemTitle className="text-xs font-medium">
+                    <ItemTitle className="text-[11px] font-medium">
                       {getRecentMealTitle(entry)}
                     </ItemTitle>
-                    <ItemDescription className="text-[11px]">
+                    <ItemDescription className="text-[10px]">
                       {formatMealType(entry.mealType)} ·{" "}
                       {format(createdAt, "MMM d, p")}
                     </ItemDescription>
                   </ItemContent>
-                  <ItemActions className="ml-auto text-xs font-semibold tabular-nums">
+                  <ItemActions className="ml-auto text-[11px] font-semibold tabular-nums">
                     {Math.round(entry.calories)} kcal
                   </ItemActions>
                 </Item>
@@ -326,148 +377,118 @@ function LandingCalendar({
   );
 
   const weeklyMetrics = useMemo(() => {
-    const today = new Date();
-    const weekStart = startOfWeek(today, { weekStartsOn: 1 });
-    const elapsedDays = differenceInCalendarDays(today, weekStart) + 1;
-
-    const summaryByDate = new Map(
-      weeklySummaries.map((summary) => [summary.date, Math.round(summary.calories)])
-    );
-
-    const days = Array.from({ length: 7 }, (_, index) => {
-      const date = addDays(weekStart, index);
-      const dateKey = format(date, "yyyy-MM-dd");
-      const calories = summaryByDate.get(dateKey) ?? 0;
-
-      return {
-        label: format(date, "EEE"),
-        dateKey,
-        calories,
-        isElapsed: index < elapsedDays,
-      };
-    });
-
-    const weeklyTotal = days
-      .filter((day) => day.isElapsed)
-      .reduce((sum, day) => sum + day.calories, 0);
-
-    const weeklyAverage = Math.round(weeklyTotal / elapsedDays);
-    const isWeeklyTargetMet = weeklyAverage <= CALORIE_GOAL;
-
-    return {
-      days,
-      weeklyAverage,
-      isWeeklyTargetMet,
-    };
+    return getWeeklyMetrics(weeklySummaries);
   }, [weeklySummaries]);
 
   const recentMealsForWidget = useMemo(
-    () => recentMeals.slice(0, 4),
+    () => recentMeals.slice(0, 3),
     [recentMeals]
   );
 
   return (
-    <CalendarProvider className="flex-1 w-full min-h-0">
-      <div className="flex h-full w-full flex-col gap-4 xl:flex-row">
-        <section className="flex min-w-0 flex-1 flex-col">
-          <CalendarDate>
-            <CalendarDatePicker>
-              <CalendarMonthPicker />
-              <CalendarYearPicker end={latestYear} start={earliestYear} />
-            </CalendarDatePicker>
-            <CalendarDatePagination />
-          </CalendarDate>
-          <CalendarHeader className="border-b-0" />
-          <CalendarBody
-            features={features}
-            className="border-none"
-            renderDay={({ day, date, features: dayFeatures, isToday }) => {
-              const feature = dayFeatures[0];
-              const dateStr = format(date, "yyyy-MM-dd");
+    <CalendarProvider className="w-full min-h-0 gap-10 flex-col xl:flex-row">
+      <section className="flex min-w-0 flex-1 flex-col">
+        <CalendarDate>
+          <CalendarDatePicker>
+            <CalendarMonthPicker />
+            <CalendarYearPicker end={latestYear} start={earliestYear} />
+          </CalendarDatePicker>
+          <CalendarDatePagination />
+        </CalendarDate>
+        <CalendarHeader className="border-b-0" />
+        <CalendarBody
+          features={features}
+          className="border-none h-[calc(100%-140px)]"
+          renderDay={({ day, date, features: dayFeatures, isToday }) => {
+            const feature = dayFeatures[0];
+            const dateStr = format(date, "yyyy-MM-dd");
 
-              if (feature) {
-                return (
-                  <FoodLogDialogWrapper
-                    key={dateStr}
-                    foodLog={feature}
-                    date={date}
-                    isToday={isToday}
-                  />
-                );
-              }
-
+            if (feature) {
               return (
-                <div
+                <FoodLogDialogWrapper
                   key={dateStr}
+                  foodLog={feature}
+                  date={date}
+                  isToday={isToday}
+                />
+              );
+            }
+
+            return (
+              <div
+                key={dateStr}
+                className={cn(
+                  "size-full p-1.5 sm:p-2 rounded-xl border transition-all text-left flex flex-col",
+                  isToday
+                    ? "border-emerald-500/50 dark:border-emerald-400/50 bg-emerald-500/10 dark:bg-emerald-400/10"
+                    : "border-border hover:border-primary/50 bg-card/10"
+                )}
+              >
+                <span
                   className={cn(
-                    "aspect-square w-full p-1.5 sm:p-2 rounded-xl border transition-all text-left flex flex-col",
+                    "text-xs sm:text-sm font-medium",
                     isToday
-                      ? "border-emerald-500/50 dark:border-emerald-400/50 bg-emerald-500/10 dark:bg-emerald-400/10"
-                      : "border-border hover:border-primary/50 bg-card/10"
+                      ? "text-emerald-600 dark:text-emerald-400"
+                      : "text-muted-foreground"
                   )}
                 >
-                  <span
-                    className={cn(
-                      "text-xs sm:text-sm font-medium",
-                      isToday
-                        ? "text-emerald-600 dark:text-emerald-400"
-                        : "text-muted-foreground"
-                    )}
-                  >
-                    {day}
-                  </span>
-                  <AddFoodDialog date={dateStr} />
-                </div>
-              );
-            }}
-          >
-            {({ feature }) => (
-              <FoodLogDialogWrapper
-                foodLog={feature}
-                key={feature.id}
-                date={feature.date}
-                isToday={isSameDay(feature.date, new Date())}
-              />
-            )}
-          </CalendarBody>
-
-          <div className="flex items-center justify-center gap-6 mt-6 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-1 bg-emerald-500 dark:bg-emerald-400 rounded-full" />
-              <span>Protein</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-1 bg-amber-500 dark:bg-amber-400 rounded-full" />
-              <span>Carbs</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-1 bg-rose-500 dark:bg-rose-400 rounded-full" />
-              <span>Fat</span>
-            </div>
-          </div>
-
-          <div className="grid gap-3 mt-4 xl:hidden">
-            <WeeklyWidget
-              days={weeklyMetrics.days}
-              weeklyAverage={weeklyMetrics.weeklyAverage}
-              isWeeklyTargetMet={weeklyMetrics.isWeeklyTargetMet}
+                  {day}
+                </span>
+                <AddFoodDialog date={dateStr} />
+              </div>
+            );
+          }}
+        >
+          {({ feature }) => (
+            <FoodLogDialogWrapper
+              foodLog={feature}
+              key={feature.id}
+              date={feature.date}
+              isToday={isSameDay(feature.date, new Date())}
             />
-            <GoalsWidget />
-            <RecentMealsWidget recentMeals={recentMealsForWidget} />
-          </div>
-        </section>
+          )}
+        </CalendarBody>
 
-        <aside className="hidden w-72 shrink-0 xl:flex xl:flex-col xl:gap-3">
+        <div className="flex items-center justify-center gap-6 mt-6 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-1 bg-emerald-500 dark:bg-emerald-400 rounded-full" />
+            <span>Protein</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-1 bg-amber-500 dark:bg-amber-400 rounded-full" />
+            <span>Carbs</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-1 bg-rose-500 dark:bg-rose-400 rounded-full" />
+            <span>Fat</span>
+          </div>
+        </div>
+
+        <div className="mt-3 grid gap-2 md:grid-cols-2 xl:hidden">
           <WeeklyWidget
             days={weeklyMetrics.days}
             weeklyAverage={weeklyMetrics.weeklyAverage}
+            weeklyTarget={weeklyMetrics.weeklyTarget}
             isWeeklyTargetMet={weeklyMetrics.isWeeklyTargetMet}
           />
           <GoalsWidget />
-          <RecentMealsWidget recentMeals={recentMealsForWidget} />
-        </aside>
-      </div>
-    </CalendarProvider>
+          <div className="md:col-span-2">
+            <RecentMealsWidget recentMeals={recentMealsForWidget} />
+          </div>
+        </div>
+      </section>
+
+      <aside className="hidden w-64 shrink-0 xl:flex xl:flex-col gap-4 xl:gap-8 mt-10">
+        <WeeklyWidget
+          days={weeklyMetrics.days}
+          weeklyAverage={weeklyMetrics.weeklyAverage}
+          weeklyTarget={weeklyMetrics.weeklyTarget}
+          isWeeklyTargetMet={weeklyMetrics.isWeeklyTargetMet}
+        />
+        <GoalsWidget />
+        <RecentMealsWidget recentMeals={recentMealsForWidget} />
+      </aside>
+    </CalendarProvider >
   );
 }
 
