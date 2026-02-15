@@ -80,6 +80,9 @@
   --sidebar-accent-foreground: oklch(0.99 0.02 95);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  scrollbar-width: thin;
+  scrollbar-color: #e3e3e3 transparent;
 }
 
 .dark {
@@ -114,12 +117,16 @@
   --sidebar-accent-foreground: oklch(0.28 0.07 46);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a3a transparent;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
