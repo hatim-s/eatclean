@@ -253,7 +253,7 @@ export function FoodLogDialog({
 
           <TabsContent value="summary" className="flex-1 overflow-y-auto outline-none p-0 mt-0 data-[state=inactive]:hidden">
             <div className="m-5">
-              <div className="bg-linear-to-br from-card/50 to-card/30 rounded-xl p-4 mb-5">
+              <div className="bg-linear-to-br from-card/50 to-card/30 rounded-xl mb-5">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="p-2 bg-orange-500/20 dark:bg-orange-400/20 rounded-lg">
                     <Flame

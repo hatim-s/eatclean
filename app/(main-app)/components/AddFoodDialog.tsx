@@ -212,7 +212,7 @@ e.g. &quot;2 scrambled eggs with toast and a glass of orange juice&quot; or &quo
           ) : (
             <div className="space-y-3">
               <div className="max-h-48 overflow-y-auto">
-                <div className="space-y-2 pr-4">
+                <div className="space-y-2 p-1">
                   {manualItems.map((item, index) => (
                     <div key={index} className="flex gap-2 items-start">
                       <div className="flex-1 space-y-2">
