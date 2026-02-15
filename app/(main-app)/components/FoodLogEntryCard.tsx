@@ -35,7 +35,7 @@ export function FoodLogEntryCard({ entry, onDeleted }: FoodLogEntryCardProps) {
 
   const handleDelete = async () => {
     if (!confirm(`Delete this ${config.label.toLowerCase()} entry?`)) return;
-    
+
     setIsDeleting(true);
     try {
       await deleteFoodLog(entry.id);
@@ -117,7 +117,7 @@ export function FoodLogEntryCard({ entry, onDeleted }: FoodLogEntryCardProps) {
         </div>
 
         {isExpanded && (
-          <div className="mt-3 pt-3 border-t border-border/50 space-y-2">
+          <div className="mt-3 pt-3 border-t border-border/50 space-y-4">
             <div>
               <h4 className="text-xs font-medium text-muted-foreground mb-2">All Items</h4>
               <div className="space-y-1.5">
@@ -136,7 +136,7 @@ export function FoodLogEntryCard({ entry, onDeleted }: FoodLogEntryCardProps) {
             </div>
 
             <div>
-              <h4 className="text-xs font-medium text-muted-foreground mb-2">Detailed Nutrition</h4>
+              <h4 className="text-xs font-medium text-muted-foreground my-2">Detailed Nutrition</h4>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="flex justify-between py-1 px-2 bg-secondary/20 rounded">
                   <span className="text-muted-foreground">Protein</span>
