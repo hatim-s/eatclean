@@ -25,8 +25,6 @@ export async function createFoodLog(userInput: string) {
 
   if (!Array.isArray(foodLog) || foodLog.length === 0) {
     return {
-      // foodVsMatches: {} as Record<string, FoodItem>,
-      // foodVsAllMatches: {} as Record<string, FoodItem[]>,
       foodVsNutrition: {} as Record<string, CalculatedNutrition>,
       accumulatedNutrition: {} as CalculatedNutrition,
       foodVsDbItem: {} as Record<string, FoodItem>,
@@ -34,7 +32,7 @@ export async function createFoodLog(userInput: string) {
     };
   }
 
-  // Step 2: FTS5 search to find candidates for each food name (no embeddings needed)
+  // Step 2: FTS5 search to find candidates for each food name
   const foodNames = foodLog.map((f) => f.food);
   const foodVsCandidates: Record<string, FoodItem[]> = {};
 
@@ -53,9 +51,7 @@ export async function createFoodLog(userInput: string) {
   });
 
   // Step 3: AI-based best match selection for each food name
-  // currently pick the first item
   const foodVsMatches: Record<string, FoodItem> = {};
-  // const foodVsAllMatches: Record<string, FoodItem[]> = {};
   const candidateEntries = Object.entries(foodVsCandidates);
   const matchPromises = candidateEntries.map(([foodName, candidates]) =>
     selectBestMatch(foodName, candidates).then((bestCandidateId) => ({
@@ -77,7 +73,6 @@ export async function createFoodLog(userInput: string) {
           console.warn(`Best candidate not found for food name: ${foodName}`);
         }
       }
-      // foodVsAllMatches[foodName] = candidates;
     } else {
       console.warn(`Best match selection failed:`, result.reason);
     }
@@ -102,8 +97,6 @@ export async function createFoodLog(userInput: string) {
 
   // Step 5: Return the results
   return {
-    // foodVsMatches,
-    // foodVsAllMatches,
     foodVsNutrition,
     accumulatedNutrition,
     foodVsDbItem: Object.fromEntries(

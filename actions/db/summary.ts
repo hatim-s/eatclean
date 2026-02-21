@@ -120,9 +120,6 @@ export async function recalculateDailySummary(
   }
 
   const userId = session.user.id;
-
-  // Import here to avoid circular dependency
-
   return await db.transaction(async (tx) => {
     // Get all logs for this day
     const dayLogs = await tx

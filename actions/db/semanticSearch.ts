@@ -6,6 +6,10 @@ import { FoodItem } from "@/types/db";
 
 export type FoodWithDistance = FoodItem & { distance: number };
 
+const QUOTES_REGEX = /['"]/g;
+const SPECIAL_CHARS_REGEX = /[^\w\s]/g;
+const WHITESPACE_REGEX = /\s+/;
+
 /**
  * FTS5 full-text search on food names (O(log n) vs O(n) for vector search)
  * Uses FTS5 virtual table with MATCH query and prefix wildcard
@@ -16,8 +20,8 @@ export async function ftsFoodSearch(
 ): Promise<FoodItem[]> {
   // Sanitize input for FTS5 query - escape special characters and add prefix wildcard
   const sanitized = foodName
-    .replace(/['"]/g, "") // Remove quotes
-    .replace(/[^\w\s]/g, " ") // Replace special chars with spaces
+    .replace(QUOTES_REGEX, "") // Remove quotes
+    .replace(SPECIAL_CHARS_REGEX, " ") // Replace special chars with spaces
     .trim();
 
   if (!sanitized) {
@@ -25,7 +29,7 @@ export async function ftsFoodSearch(
   }
 
   // Build FTS5 query with prefix matching for each word
-  const terms = sanitized.split(/\s+/).filter(Boolean);
+  const terms = sanitized.split(WHITESPACE_REGEX).filter(Boolean);
 
   // @todo: add sanitization to prevent sql injection ?
   const ftsQuery = terms.map((term) => `${term}*`).join(" ");
