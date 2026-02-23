@@ -98,10 +98,3 @@ export type AnimatedCounterProps = {
 export type NutrientBarProps = NutrientItem & {
   className?: string;
 };
-
-export type TypingDemoCardProps = {
-  prompt: string;
-  parsedItems: DemoParsedItem[];
-  totalCalories: number;
-  className?: string;
-};
