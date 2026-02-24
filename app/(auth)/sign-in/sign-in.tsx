@@ -57,10 +57,10 @@ export default function SignInPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 px-6 pb-6">
-              <div className="h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent" />
+              <div className="h-px bg-linear-to-r from-transparent via-zinc-700 to-transparent" />
 
               <Button
-                className="h-11 w-full justify-center gap-2 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-zinc-900 hover:from-amber-300 hover:to-amber-500"
+                className="h-11 w-full justify-center gap-2 rounded-xl bg-linear-to-br from-amber-400 to-amber-600 text-zinc-900 hover:from-amber-300 hover:to-amber-500"
                 type="button"
                 onClick={async () => {
                   await signIn.social({
