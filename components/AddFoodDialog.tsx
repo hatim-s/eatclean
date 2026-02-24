@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sparkles, Plus, Check, Trash2, X } from "lucide-react";
 import {
@@ -44,9 +44,19 @@ interface AddFoodDialogProps {
   onSuccess?: () => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  trigger?: ReactNode;
+  triggerClassName?: string;
 }
 
-export function AddFoodDialog({ date, hideTrigger, onSuccess, open, onOpenChange }: AddFoodDialogProps) {
+export function AddFoodDialog({
+  date,
+  hideTrigger,
+  onSuccess,
+  open,
+  onOpenChange,
+  trigger,
+  triggerClassName,
+}: AddFoodDialogProps) {
   const router = useRouter();
   const [mode, setMode] = useState<"ai" | "manual">("ai");
   const [prompt, setPrompt] = useState("");
@@ -123,12 +133,17 @@ export function AddFoodDialog({ date, hideTrigger, onSuccess, open, onOpenChange
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal>
-      {!hideTrigger && (
+      {trigger ? (
+        <DialogTrigger className={triggerClassName}>{trigger}</DialogTrigger>
+      ) : !hideTrigger ? (
         <DialogTrigger className="w-full flex-1 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
           <Plus size={16} className="text-muted-foreground" />
         </DialogTrigger>
-      )}
-      <DialogContent className="bg-card border-border w-lg max-w-lg! p-0 flex flex-col gap-0 overflow-hidden" showCloseButton={false}>
+      ) : null}
+      <DialogContent
+        className="bg-card border-border top-auto bottom-0 max-h-[90vh] w-full max-w-none rounded-b-none rounded-t-2xl p-0 flex flex-col gap-0 overflow-hidden -translate-y-0 sm:max-w-none md:top-1/2 md:bottom-auto md:w-[32rem] md:max-w-[32rem] md:rounded-2xl md:-translate-y-1/2"
+        showCloseButton={false}
+      >
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div>
             <DialogTitle className="text-lg font-semibold text-foreground">Log Food</DialogTitle>

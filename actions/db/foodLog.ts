@@ -2,9 +2,10 @@
 
 import { db, foodLog, dailySummary } from "@/db";
 import { getSession } from "@/auth/session";
-import { eq, and, asc, desc } from "drizzle-orm";
+import { eq, and, asc, desc, gte, lte } from "drizzle-orm";
 import { NewFoodLog, FoodLog as FoodLogType, FoodItem } from "@/types/db";
 import { sumNutritionFromLogItems } from "../lib/sumNutritionFromLogItems";
+import { endOfMonth, format, parseISO, startOfMonth } from "date-fns";
 
 type FoodLogItemWithQuantity = Omit<FoodItem, "embedding" | "dataSource"> & {
   quantity_gms: number;
@@ -132,6 +133,31 @@ export async function getRecentFoodLogs(limit = 5): Promise<FoodLogType[]> {
     .where(eq(foodLog.userId, session.user.id))
     .orderBy(desc(foodLog.createdAt))
     .limit(safeLimit);
+}
+
+export async function getFoodLogsByMonth(
+  monthDate: string | Date
+): Promise<FoodLogType[]> {
+  const session = await getSession();
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const date = typeof monthDate === "string" ? parseISO(monthDate) : monthDate;
+  const monthStart = format(startOfMonth(date), "yyyy-MM-dd");
+  const monthEnd = format(endOfMonth(date), "yyyy-MM-dd");
+
+  return await db
+    .select()
+    .from(foodLog)
+    .where(
+      and(
+        eq(foodLog.userId, session.user.id),
+        gte(foodLog.logDate, monthStart),
+        lte(foodLog.logDate, monthEnd)
+      )
+    )
+    .orderBy(desc(foodLog.createdAt));
 }
 
 export async function deleteFoodLog(id: string): Promise<void> {

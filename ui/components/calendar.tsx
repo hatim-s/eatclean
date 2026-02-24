@@ -612,6 +612,7 @@ export {
   monthsForLocale,
   useCalendarMonth,
   useCalendarYear,
+  useCalendarActions,
   type CalendarBodyProps,
   type CalendarDatePaginationProps,
   type CalendarDatePickerProps,

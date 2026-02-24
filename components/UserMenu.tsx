@@ -18,15 +18,23 @@ import {
 import { ChevronDown, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { cn } from "@/ui/lib/utils";
 
 type UserMenuProps = {
   name?: string | null;
   email?: string | null;
   image?: string | null;
   initials: string;
+  variant?: "default" | "compact";
 };
 
-export function UserMenu({ name, email, image, initials }: UserMenuProps) {
+export function UserMenu({
+  name,
+  email,
+  image,
+  initials,
+  variant = "default",
+}: UserMenuProps) {
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
@@ -46,20 +54,31 @@ export function UserMenu({ name, email, image, initials }: UserMenuProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="hover:bg-muted focus-visible:ring-ring/50 inline-flex max-w-full items-center gap-2 rounded-md px-2 py-1 outline-none transition-colors focus-visible:ring-[3px]">
-        <Avatar size="sm">
+      <DropdownMenuTrigger
+        className={cn(
+          "hover:bg-muted focus-visible:ring-ring/50 inline-flex max-w-full items-center outline-none transition-colors focus-visible:ring-[3px]",
+          variant === "compact"
+            ? "rounded-full p-1"
+            : "gap-2 rounded-md px-2 py-1"
+        )}
+      >
+        <Avatar size={variant === "compact" ? "default" : "sm"}>
           <AvatarImage alt={name || "User"} src={image || undefined} />
           <AvatarFallback>{initials}</AvatarFallback>
         </Avatar>
-        <div className="min-w-0 text-left">
-          <p className="truncate text-xs font-medium text-foreground">
-            {name || "User"}
-          </p>
-          <p className="hidden max-w-44 truncate text-[11px] text-muted-foreground sm:block">
-            {email || ""}
-          </p>
-        </div>
-        <ChevronDown className="size-3.5 text-muted-foreground" />
+        {variant === "default" && (
+          <>
+            <div className="min-w-0 text-left">
+              <p className="truncate text-xs font-medium text-foreground">
+                {name || "User"}
+              </p>
+              <p className="hidden max-w-44 truncate text-[11px] text-muted-foreground sm:block">
+                {email || ""}
+              </p>
+            </div>
+            <ChevronDown className="size-3.5 text-muted-foreground" />
+          </>
+        )}
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-56" sideOffset={8}>

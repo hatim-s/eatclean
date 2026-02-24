@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import {
   Dialog,
   DialogTrigger,
@@ -57,6 +57,8 @@ export function FoodLogDialog({
   isToday,
   entries,
   onRefresh,
+  trigger,
+  triggerClassName,
 }: {
   foodLog: Feature & {
     foodItems?: Array<{ food_id: number; food_name: string; quantity_gms: number }>;
@@ -65,6 +67,8 @@ export function FoodLogDialog({
   isToday: boolean;
   entries?: FoodLog[];
   onRefresh?: () => void;
+  trigger?: ReactNode;
+  triggerClassName?: string;
 }) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -144,56 +148,63 @@ export function FoodLogDialog({
 
   return (
     <Dialog>
-      <DialogTrigger
-        className={`w-full h-full overflow-hidden p-1.5 sm:p-2 rounded-xl border transition-all text-left flex flex-col aspect-square
-        ${isToday
-            ? "border-emerald-500/50 dark:border-emerald-400/50 bg-emerald-500/10 dark:bg-emerald-400/10"
-            : "border-border hover:border-primary/50 bg-card/50"
-          }
-        ${hasData ? "hover:bg-accent/10" : "hover:bg-card"}`}
-      >
-        <span
-          className={`text-xs sm:text-sm font-medium ${isToday ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"
-            }`}
+      {trigger ? (
+        <DialogTrigger className={triggerClassName}>{trigger}</DialogTrigger>
+      ) : (
+        <DialogTrigger
+          className={`w-full h-full overflow-hidden p-1.5 sm:p-2 rounded-xl border transition-all text-left flex flex-col aspect-square
+          ${isToday
+              ? "border-emerald-500/50 dark:border-emerald-400/50 bg-emerald-500/10 dark:bg-emerald-400/10"
+              : "border-border hover:border-primary/50 bg-card/50"
+            }
+          ${hasData ? "hover:bg-accent/10" : "hover:bg-card"}`}
         >
-          {day}
-        </span>
-        {hasData && (
-          <div className="flex-1 flex flex-col justify-end gap-1 mt-1">
-            <div className="flex items-baseline gap-1">
-              <span className="text-sm sm:text-lg font-semibold text-foreground">
-                {foodLog.calories}
-              </span>
-              <span className="text-[10px] text-muted-foreground hidden sm:inline">
-                kcal
-              </span>
+          <span
+            className={`text-xs sm:text-sm font-medium ${isToday ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"
+              }`}
+          >
+            {day}
+          </span>
+          {hasData && (
+            <div className="flex-1 flex flex-col justify-end gap-1 mt-1">
+              <div className="flex items-baseline gap-1">
+                <span className="text-sm sm:text-lg font-semibold text-foreground">
+                  {foodLog.calories}
+                </span>
+                <span className="text-[10px] text-muted-foreground hidden sm:inline">
+                  kcal
+                </span>
+              </div>
+              <div className="space-y-0.5 hidden sm:block">
+                <MacroBar
+                  value={foodLog.protein}
+                  max={goals.protein}
+                  color="bg-emerald-500 dark:bg-emerald-400"
+                />
+                <MacroBar
+                  value={foodLog.carbs}
+                  max={goals.carbs}
+                  color="bg-amber-500 dark:bg-amber-400"
+                />
+                <MacroBar
+                  value={foodLog.fat}
+                  max={goals.fat}
+                  color="bg-rose-500 dark:bg-rose-400"
+                />
+              </div>
+              <div className="flex gap-0.5 sm:hidden">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400" />
+                <div className="w-1.5 h-1.5 rounded-full bg-rose-500 dark:bg-rose-400" />
+              </div>
             </div>
-            <div className="space-y-0.5 hidden sm:block">
-              <MacroBar
-                value={foodLog.protein}
-                max={goals.protein}
-                color="bg-emerald-500 dark:bg-emerald-400"
-              />
-              <MacroBar
-                value={foodLog.carbs}
-                max={goals.carbs}
-                color="bg-amber-500 dark:bg-amber-400"
-              />
-              <MacroBar
-                value={foodLog.fat}
-                max={goals.fat}
-                color="bg-rose-500 dark:bg-rose-400"
-              />
-            </div>
-            <div className="flex gap-0.5 sm:hidden">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
-              <div className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400" />
-              <div className="w-1.5 h-1.5 rounded-full bg-rose-500 dark:bg-rose-400" />
-            </div>
-          </div>
-        )}
-      </DialogTrigger>
-      <DialogContent className="bg-card border border-border rounded-2xl w-xl max-w-xl! max-h-[85vh] overflow-hidden flex flex-col p-0 gap-0" showCloseButton={false}>
+          )}
+        </DialogTrigger>
+      )}
+      <DialogContent
+        className="bg-card border border-border top-auto bottom-0 max-h-[90vh] w-full max-w-none rounded-b-none rounded-t-2xl p-0 gap-0 overflow-hidden flex flex-col -translate-y-0 sm:max-w-none md:top-1/2 md:bottom-auto md:w-[40rem] md:max-w-[40rem] md:rounded-2xl md:-translate-y-1/2"
+        showCloseButton={false}
+      >
         <div className="p-5 border-b border-border flex items-center justify-between">
           <div>
             <DialogTitle className="text-lg font-semibold text-foreground">

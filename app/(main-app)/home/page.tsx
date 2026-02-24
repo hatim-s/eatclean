@@ -1,9 +1,9 @@
 import { LandingCalendar } from "@/components/LandingCalendar";
 import { getMonthlySummary, getWeeklySummary } from "@/actions/db/summary";
-import { getRecentFoodLogs } from "@/actions/db/foodLog";
+import { getFoodLogsByMonth, getRecentFoodLogs } from "@/actions/db/foodLog";
 import { getSession } from "@/auth/session";
 import { Leaf } from "lucide-react";
-import { UserMenu } from "@/components/UserMenu";
+import { DashboardHeaderActions } from "@/components/DashboardHeaderActions";
 
 function getUserInitials(
   name: string | null | undefined,
@@ -26,11 +26,12 @@ function getUserInitials(
 }
 
 export default async function Home() {
-  const [session, summaries, weeklySummaries, recentMeals] = await Promise.all([
+  const [session, summaries, weeklySummaries, recentMeals, monthlyLogs] = await Promise.all([
     getSession(),
     getMonthlySummary(new Date()),
     getWeeklySummary(new Date()),
     getRecentFoodLogs(4),
+    getFoodLogsByMonth(new Date()),
   ]);
   const user = session?.user;
 
@@ -49,7 +50,7 @@ export default async function Home() {
             </div>
           </div>
 
-          <UserMenu
+          <DashboardHeaderActions
             email={user?.email}
             image={user?.image}
             initials={getUserInitials(user?.name, user?.email)}
@@ -60,6 +61,7 @@ export default async function Home() {
 
       <main className="mx-auto flex w-full flex-1 min-h-0 flex-col px-4 pb-4 pt-4 sm:px-6 sm:pb-6 lg:px-10 overflow-auto">
         <LandingCalendar
+          monthlyLogs={monthlyLogs}
           summaries={summaries}
           weeklySummaries={weeklySummaries}
           recentMeals={recentMeals}

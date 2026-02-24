@@ -6,6 +6,7 @@ import { FoodLogDialog } from "./FoodLogDialog";
 import { getFoodLogsByDate } from "@/actions/db/foodLog";
 import { Feature } from "@/ui/components/calendar";
 import { FoodLog } from "@/types/db";
+import { ReactNode } from "react";
 
 interface FoodLogDialogWrapperProps {
   foodLog: Feature & {
@@ -13,9 +14,17 @@ interface FoodLogDialogWrapperProps {
   };
   date: Date;
   isToday: boolean;
+  trigger?: ReactNode;
+  triggerClassName?: string;
 }
 
-export function FoodLogDialogWrapper({ foodLog, date, isToday }: FoodLogDialogWrapperProps) {
+export function FoodLogDialogWrapper({
+  foodLog,
+  date,
+  isToday,
+  trigger,
+  triggerClassName,
+}: FoodLogDialogWrapperProps) {
   const [entries, setEntries] = useState<FoodLog[]>([]);
   const dateStr = format(date, "yyyy-MM-dd");
 
@@ -29,8 +38,25 @@ export function FoodLogDialogWrapper({ foodLog, date, isToday }: FoodLogDialogWr
   }, [dateStr]);
 
   useEffect(() => {
-    fetchEntries();
-  }, [fetchEntries]);
+    let isMounted = true;
+
+    const loadEntries = async () => {
+      try {
+        const data = await getFoodLogsByDate(dateStr);
+        if (isMounted) {
+          setEntries(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch food logs:", error);
+      }
+    };
+
+    void loadEntries();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [dateStr]);
 
   return (
     <FoodLogDialog
@@ -39,6 +65,8 @@ export function FoodLogDialogWrapper({ foodLog, date, isToday }: FoodLogDialogWr
       isToday={isToday}
       entries={entries}
       onRefresh={fetchEntries}
+      trigger={trigger}
+      triggerClassName={triggerClassName}
     />
   );
 }
