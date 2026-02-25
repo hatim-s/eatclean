@@ -1,5 +1,5 @@
 import {
-  Progress,
+  ProgressRoot,
   ProgressIndicator,
   ProgressTrack,
 } from "@/ui/components/base/progress";
@@ -53,11 +53,11 @@ export function MacroProgressRows({
                 <span className="text-muted-foreground"> / {item.goal}{unit}</span>
               </span>
             </div>
-            <Progress value={progress} className="gap-0">
+            <ProgressRoot value={progress} className="gap-0">
               <ProgressTrack className={compact ? "h-1.5" : "h-2"}>
                 <ProgressIndicator className={toneToIndicatorClass[item.tone]} />
               </ProgressTrack>
-            </Progress>
+            </ProgressRoot>
           </div>
         );
       })}

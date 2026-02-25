@@ -58,6 +58,8 @@ export function AddFoodDialog({
   triggerClassName,
 }: AddFoodDialogProps) {
   const router = useRouter();
+  const isOpenControlled = open !== undefined;
+  const [internalOpen, setInternalOpen] = useState(false);
   const [mode, setMode] = useState<"ai" | "manual">("ai");
   const [prompt, setPrompt] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -67,6 +69,14 @@ export function AddFoodDialog({
 
   const dateObj = new Date(date + "T00:00:00");
   const formattedDate = dateObj.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  const isOpen = isOpenControlled ? open : internalOpen;
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!isOpenControlled) {
+      setInternalOpen(nextOpen);
+    }
+    onOpenChange?.(nextOpen);
+  };
 
   const handleSubmit = async () => {
     setError("");
@@ -111,6 +121,7 @@ export function AddFoodDialog({
       });
 
       onSuccess?.();
+      handleOpenChange(false);
       router.refresh();
       setPrompt("");
       setManualItems([{ food: "", quantity: "" }]);
@@ -132,7 +143,7 @@ export function AddFoodDialog({
   const hasValidManualItems = manualItems.some((item) => item.food.trim() && item.quantity.trim());
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} modal>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange} modal>
       {trigger ? (
         <DialogTrigger className={triggerClassName}>{trigger}</DialogTrigger>
       ) : !hideTrigger ? (

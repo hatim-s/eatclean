@@ -1,5 +1,5 @@
 import { ChevronRight } from "lucide-react";
-import { Progress, ProgressIndicator, ProgressTrack } from "@/ui/components/base/progress";
+import { ProgressIndicator, ProgressRoot, ProgressTrack } from "@/ui/components/base/progress";
 import { cn } from "@/ui/lib/utils";
 
 type TimelineDayCardProps = {
@@ -55,11 +55,11 @@ export function TimelineDayCard({
         </span>
       </div>
 
-      <Progress value={progress} className="gap-0">
+      <ProgressRoot value={progress} className="gap-0">
         <ProgressTrack className="h-1.5">
           <ProgressIndicator className="bg-primary/70" />
         </ProgressTrack>
-      </Progress>
+      </ProgressRoot>
     </div>
   );
 }

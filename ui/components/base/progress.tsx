@@ -25,6 +25,22 @@ function Progress({
   )
 }
 
+function ProgressRoot({
+  className,
+  children,
+  value,
+  ...props
+}: ProgressPrimitive.Root.Props) {
+  return <ProgressPrimitive.Root
+    value={value}
+    data-slot="progress"
+    className={cn("flex flex-wrap gap-3", className)}
+    {...props}
+  >
+    {children}
+  </ProgressPrimitive.Root>
+}
+
 function ProgressTrack({ className, ...props }: ProgressPrimitive.Track.Props) {
   return (
     <ProgressPrimitive.Track
@@ -73,6 +89,7 @@ function ProgressValue({ className, ...props }: ProgressPrimitive.Value.Props) {
 
 export {
   Progress,
+  ProgressRoot,
   ProgressTrack,
   ProgressIndicator,
   ProgressLabel,
