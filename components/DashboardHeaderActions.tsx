@@ -31,7 +31,7 @@ export function DashboardHeaderActions({
             <span className="sr-only">Log Food</span>
           </>
         }
-        triggerClassName="inline-flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground transition-colors hover:bg-primary/90 md:hidden"
+        triggerClassName="inline-flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-primary/90 md:hidden"
       />
 
       <div className="md:hidden">
@@ -45,12 +45,7 @@ export function DashboardHeaderActions({
       </div>
 
       <div className="hidden md:block">
-        <UserMenu
-          email={email}
-          image={image}
-          initials={initials}
-          name={name}
-        />
+        <UserMenu email={email} image={image} initials={initials} name={name} />
       </div>
     </div>
   );

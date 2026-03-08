@@ -64,11 +64,17 @@ export function AddFoodDialog({
   const [prompt, setPrompt] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState("");
-  const [manualItems, setManualItems] = useState<ManualItem[]>([{ food: "", quantity: "" }]);
+  const [manualItems, setManualItems] = useState<ManualItem[]>([
+    { food: "", quantity: "" },
+  ]);
   const [mealType, setMealType] = useState<MealType>(getMealTypeFromTime());
 
   const dateObj = new Date(date + "T00:00:00");
-  const formattedDate = dateObj.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  const formattedDate = dateObj.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
   const isOpen = isOpenControlled ? open : internalOpen;
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -84,7 +90,9 @@ export function AddFoodDialog({
     if (mode === "ai") {
       if (!prompt.trim()) return;
     } else {
-      const validItems = manualItems.filter((item) => item.food.trim() && item.quantity.trim());
+      const validItems = manualItems.filter(
+        (item) => item.food.trim() && item.quantity.trim(),
+      );
       if (validItems.length === 0) return;
     }
 
@@ -92,12 +100,21 @@ export function AddFoodDialog({
     try {
       let input = prompt;
       if (mode === "manual") {
-        const validItems = manualItems.filter((item) => item.food.trim() && item.quantity.trim());
-        input = validItems.map((item) => `${item.food}, ${item.quantity}`).join("; ");
+        const validItems = manualItems.filter(
+          (item) => item.food.trim() && item.quantity.trim(),
+        );
+        input = validItems
+          .map((item) => `${item.food}, ${item.quantity}`)
+          .join("; ");
       }
 
       const matchesMap = await createFoodLog(input);
-      const { foodVsNutrition, accumulatedNutrition, foodVsDbItem, foodVsQuantityGms } = matchesMap;
+      const {
+        foodVsNutrition,
+        accumulatedNutrition,
+        foodVsDbItem,
+        foodVsQuantityGms,
+      } = matchesMap;
 
       if (Object.keys(foodVsNutrition).length === 0) {
         setError("No foods found. Please try a different description.");
@@ -126,21 +143,33 @@ export function AddFoodDialog({
       setPrompt("");
       setManualItems([{ food: "", quantity: "" }]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to log food. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to log food. Please try again.",
+      );
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const addManualItem = () => setManualItems([...manualItems, { food: "", quantity: "" }]);
-  const removeManualItem = (index: number) => setManualItems(manualItems.filter((_, idx) => idx !== index));
-  const updateManualItem = (index: number, field: keyof ManualItem, value: string) => {
+  const addManualItem = () =>
+    setManualItems([...manualItems, { food: "", quantity: "" }]);
+  const removeManualItem = (index: number) =>
+    setManualItems(manualItems.filter((_, idx) => idx !== index));
+  const updateManualItem = (
+    index: number,
+    field: keyof ManualItem,
+    value: string,
+  ) => {
     const updated = [...manualItems];
     updated[index][field] = value;
     setManualItems(updated);
   };
 
-  const hasValidManualItems = manualItems.some((item) => item.food.trim() && item.quantity.trim());
+  const hasValidManualItems = manualItems.some(
+    (item) => item.food.trim() && item.quantity.trim(),
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange} modal>
@@ -152,12 +181,14 @@ export function AddFoodDialog({
         </DialogTrigger>
       ) : null}
       <DialogContent
-        className="bg-card border-border top-auto bottom-0 max-h-[90vh] w-full max-w-none rounded-b-none rounded-t-2xl p-0 flex flex-col gap-0 overflow-hidden -translate-y-0 sm:max-w-none md:top-1/2 md:bottom-auto md:w-[32rem] md:max-w-[32rem] md:rounded-2xl md:-translate-y-1/2"
+        className="bg-card border-border top-auto bottom-0 max-h-[90vh] w-full max-w-none rounded-b-none rounded-t-2xl p-0 flex flex-col gap-0 overflow-hidden translate-y-0 sm:max-w-none md:top-1/2 md:bottom-auto md:w-lg md:max-w-lg md:rounded-2xl md:-translate-y-1/2"
         showCloseButton={false}
       >
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div>
-            <DialogTitle className="text-lg font-semibold text-foreground">Log Food</DialogTitle>
+            <DialogTitle className="text-lg font-semibold text-foreground">
+              Log Food
+            </DialogTitle>
             <p className="text-sm text-muted-foreground">{formattedDate}</p>
           </div>
           <DialogClose className="p-2 hover:bg-muted hover:text-foreground rounded-lg transition-colors">
@@ -167,7 +198,9 @@ export function AddFoodDialog({
 
         <div className="p-4">
           <div className="mb-4">
-            <label className="text-xs text-muted-foreground mb-1.5 block">Meal Type</label>
+            <label className="text-xs text-muted-foreground mb-1.5 block">
+              Meal Type
+            </label>
             <div className="flex gap-1.5">
               {MEAL_TYPES.map(({ value, label }) => (
                 <button
@@ -178,7 +211,7 @@ export function AddFoodDialog({
                     "flex-1 py-1.5 px-2 text-xs font-medium rounded-lg transition-colors",
                     mealType === value
                       ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80",
                   )}
                 >
                   {label}
@@ -193,9 +226,9 @@ export function AddFoodDialog({
                 <Textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Describe what you ate...
+                  placeholder='Describe what you ate...
 
-e.g. &quot;2 scrambled eggs with toast and a glass of orange juice&quot; or &quot;chicken salad with about 150g grilled chicken, mixed greens, tomatoes, and olive oil dressing&quot;"
+e.g. "2 scrambled eggs with toast and a glass of orange juice" or "chicken salad with about 150g grilled chicken, mixed greens, tomatoes, and olive oil dressing"'
                   className="w-full h-32 bg-muted/50 border-border rounded-xl px-4 py-3 text-foreground placeholder-muted-foreground text-sm resize-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                 />
                 <div className="absolute bottom-3 right-3 flex items-center gap-2">
@@ -245,14 +278,18 @@ e.g. &quot;2 scrambled eggs with toast and a glass of orange juice&quot; or &quo
                         <Input
                           type="text"
                           value={item.food}
-                          onChange={(e) => updateManualItem(index, "food", e.target.value)}
+                          onChange={(e) =>
+                            updateManualItem(index, "food", e.target.value)
+                          }
                           placeholder="Food name (e.g. chicken breast)"
                           className="bg-muted/50 border-border rounded-lg px-3 py-2 text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-primary"
                         />
                         <Input
                           type="text"
                           value={item.quantity}
-                          onChange={(e) => updateManualItem(index, "quantity", e.target.value)}
+                          onChange={(e) =>
+                            updateManualItem(index, "quantity", e.target.value)
+                          }
                           placeholder="Quantity (e.g. 150g, 1 cup, 2 pieces)"
                           className="bg-muted/50 border-border rounded-lg px-3 py-2 text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-primary"
                         />
@@ -300,8 +337,16 @@ e.g. &quot;2 scrambled eggs with toast and a glass of orange juice&quot; or &quo
                 ) : (
                   <>
                     <Check size={16} className="mr-2" />
-                    Log {manualItems.filter((i) => i.food.trim() && i.quantity.trim()).length || ""} Item
-                    {manualItems.filter((i) => i.food.trim() && i.quantity.trim()).length !== 1 ? "s" : ""}
+                    Log{" "}
+                    {manualItems.filter(
+                      (i) => i.food.trim() && i.quantity.trim(),
+                    ).length || ""}{" "}
+                    Item
+                    {manualItems.filter(
+                      (i) => i.food.trim() && i.quantity.trim(),
+                    ).length !== 1
+                      ? "s"
+                      : ""}
                   </>
                 )}
               </Button>

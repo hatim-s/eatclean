@@ -1,5 +1,8 @@
-import { format } from "date-fns";
+"use client";
+
+import { format, isSameDay, parseISO } from "date-fns";
 import { Beef, Droplets, Flame, TrendingUp, Wheat } from "lucide-react";
+import { FoodLogDialogWrapper } from "@/components/FoodLogDialogWrapper";
 import { FoodLog } from "@/types/db";
 import { Badge } from "@/ui/components/base/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/components/base/card";
@@ -200,6 +203,8 @@ export function GoalsWidget() {
 }
 
 export function RecentMealsWidget({ recentMeals }: { recentMeals: FoodLog[] }) {
+  const today = new Date();
+
   return (
     <Card size="sm">
       <CardHeader className="pb-1.5">
@@ -217,11 +222,10 @@ export function RecentMealsWidget({ recentMeals }: { recentMeals: FoodLog[] }) {
                 entry.createdAt instanceof Date
                   ? entry.createdAt
                   : new Date(entry.createdAt);
-
-              return (
+              const logDate = parseISO(entry.logDate);
+              const mealItem = (
                 <Item
-                  key={entry.id}
-                  className="rounded-md border-transparent px-2 py-1.5"
+                  className="cursor-pointer rounded-md border-transparent px-2 py-1.5 transition-colors hover:bg-accent/70"
                   size="xs"
                   variant="muted"
                 >
@@ -238,6 +242,16 @@ export function RecentMealsWidget({ recentMeals }: { recentMeals: FoodLog[] }) {
                     {Math.round(entry.calories)} kcal
                   </ItemActions>
                 </Item>
+              );
+
+              return (
+                <FoodLogDialogWrapper
+                  key={entry.id}
+                  date={logDate}
+                  isToday={isSameDay(logDate, today)}
+                  trigger={mealItem}
+                  triggerClassName="w-full text-left"
+                />
               );
             })}
           </ItemGroup>
