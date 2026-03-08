@@ -1,6 +1,6 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, Plus, Check, Trash2, X } from "lucide-react";
+import { Sparkles, Plus, Check, Trash2, X, Mic, Square } from "lucide-react";
 import {
   Dialog,
   DialogTrigger,
@@ -12,9 +12,9 @@ import { Button } from "@/ui/components/base/button";
 import { Textarea } from "@/ui/components/base/textarea";
 import { Input } from "@/ui/components/base/input";
 
-import { cn } from "@/ui/lib/utils";
 import { createFoodLog } from "@/actions/createFoodLog";
 import { createFoodLogEntry } from "@/actions/db/foodLog";
+import { useSpeechRecognition } from "@/ui/hooks/use-speech-recognition";
 
 const MEAL_TYPES = [
   { value: "breakfast", label: "Breakfast" },
@@ -68,6 +68,21 @@ export function AddFoodDialog({
     { food: "", quantity: "" },
   ]);
   const [mealType, setMealType] = useState<MealType>(getMealTypeFromTime());
+  const {
+    error: speechError,
+    interimTranscript,
+    isListening,
+    isSupported: isSpeechRecognitionSupported,
+    startListening,
+    stopListening,
+  } = useSpeechRecognition({
+    onTranscript: (transcript) => {
+      setPrompt((currentPrompt) => {
+        const trimmedPrompt = currentPrompt.trimEnd();
+        return trimmedPrompt ? `${trimmedPrompt} ${transcript}` : transcript;
+      });
+    },
+  });
 
   const dateObj = new Date(date + "T00:00:00");
   const formattedDate = dateObj.toLocaleDateString("en-US", {
@@ -86,6 +101,7 @@ export function AddFoodDialog({
 
   const handleSubmit = async () => {
     setError("");
+    stopListening();
 
     if (mode === "ai") {
       if (!prompt.trim()) return;
@@ -166,10 +182,18 @@ export function AddFoodDialog({
     updated[index][field] = value;
     setManualItems(updated);
   };
-
-  const hasValidManualItems = manualItems.some(
+  const validManualItemCount = manualItems.filter(
     (item) => item.food.trim() && item.quantity.trim(),
-  );
+  ).length;
+  const displayPrompt = interimTranscript
+    ? `${prompt.trimEnd()}${prompt.trim() ? " " : ""}${interimTranscript}`
+    : prompt;
+
+  useEffect(() => {
+    if (!isOpen || mode !== "ai") {
+      stopListening();
+    }
+  }, [isOpen, mode, stopListening]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange} modal>
@@ -222,18 +246,55 @@ export function AddFoodDialog({
             <div className="space-y-3">
               <div className="relative">
                 <Textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
+                  value={displayPrompt}
+                  onChange={(e) => {
+                    if (isListening) {
+                      return;
+                    }
+
+                    setPrompt(e.target.value);
+                  }}
                   placeholder='Describe what you ate...
 
 e.g. "2 scrambled eggs with toast and a glass of orange juice" or "chicken salad with about 150g grilled chicken, mixed greens, tomatoes, and olive oil dressing"'
                   variant="filled"
-                  className="w-full h-32 resize-none text-foreground placeholder-muted-foreground text-sm"
+                  className="w-full h-32 resize-none pr-22 pb-12 text-foreground placeholder-muted-foreground text-sm"
+                  readOnly={isListening}
                 />
-                <div className="absolute bottom-3 right-3 flex items-center gap-2">
-                  <Sparkles size={14} className="text-muted-foreground" />
-                </div>
+                {isSpeechRecognitionSupported ? (
+                  <Button
+                    type="button"
+                    variant={isListening ? "secondary" : "outline"}
+                    size="xs"
+                    onClick={isListening ? stopListening : startListening}
+                    disabled={isProcessing}
+                    className="absolute bottom-3 right-3 z-10"
+                  >
+                    {isListening ? (
+                      <>
+                        <Square size={12} className="mr-1" />
+                        Stop
+                      </>
+                    ) : (
+                      <>
+                        <Mic size={12} className="mr-1" />
+                        Voice
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <div className="absolute bottom-3 right-3 z-10 flex items-center gap-1 rounded-md bg-background/90 px-2 py-1 text-[11px] text-muted-foreground">
+                    <Sparkles size={12} />
+                    Voice unavailable
+                  </div>
+                )}
               </div>
+
+              {speechError && (
+                <div className="text-sm text-destructive bg-destructive/10 rounded-lg p-2.5">
+                  {speechError}
+                </div>
+              )}
 
               {error && (
                 <div className="text-sm text-destructive bg-destructive/10 rounded-lg p-2.5">
@@ -243,7 +304,7 @@ e.g. "2 scrambled eggs with toast and a glass of orange juice" or "chicken salad
 
               <Button
                 onClick={handleSubmit}
-                disabled={!prompt.trim() || isProcessing}
+                disabled={!prompt.trim() || isProcessing || isListening}
                 size="lg"
                 className="w-full"
               >
@@ -264,7 +325,10 @@ e.g. "2 scrambled eggs with toast and a glass of orange juice" or "chicken salad
                 type="button"
                 variant="ghost"
                 size="xs"
-                onClick={() => setMode("manual")}
+                onClick={() => {
+                  stopListening();
+                  setMode("manual");
+                }}
                 className="w-full text-muted-foreground"
               >
                 or enter items manually
@@ -332,7 +396,7 @@ e.g. "2 scrambled eggs with toast and a glass of orange juice" or "chicken salad
 
               <Button
                 onClick={handleSubmit}
-                disabled={!hasValidManualItems || isProcessing}
+                disabled={!validManualItemCount || isProcessing}
                 size="xl"
                 className="w-full"
               >
@@ -344,16 +408,8 @@ e.g. "2 scrambled eggs with toast and a glass of orange juice" or "chicken salad
                 ) : (
                   <>
                     <Check size={16} className="mr-2" />
-                    Log{" "}
-                    {manualItems.filter(
-                      (i) => i.food.trim() && i.quantity.trim(),
-                    ).length || ""}{" "}
-                    Item
-                    {manualItems.filter(
-                      (i) => i.food.trim() && i.quantity.trim(),
-                    ).length !== 1
-                      ? "s"
-                      : ""}
+                    Log {validManualItemCount || ""} Item
+                    {validManualItemCount !== 1 ? "s" : ""}
                   </>
                 )}
               </Button>
