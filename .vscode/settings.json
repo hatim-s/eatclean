@@ -1,0 +1,7 @@
+{
+    "typescript.experimental.useTsgo": true,
+    "typescript.preferences.organizeImports": {
+        "caseSensitivity": "caseInsensitive",
+        "typeOrder": "first"
+    }
+}
