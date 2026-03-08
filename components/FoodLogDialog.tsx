@@ -59,14 +59,14 @@ export function FoodLogDialog({
   triggerClassName,
 }: {
   foodLog?:
-    | (Feature & {
-        foodItems?: Array<{
-          food_id: number;
-          food_name: string;
-          quantity_gms: number;
-        }>;
-      })
-    | null;
+  | (Feature & {
+    foodItems?: Array<{
+      food_id: number;
+      food_name: string;
+      quantity_gms: number;
+    }>;
+  })
+  | null;
   date: Date;
   isToday: boolean;
   entries?: FoodLog[];
@@ -91,11 +91,11 @@ export function FoodLogDialog({
       quantity_gms: number;
     }>;
   } = foodLog
-    ? {
+      ? {
         ...foodLog,
         foodItems: foodLog.foodItems ?? [],
       }
-    : {
+      : {
         id: "unavailable",
         date,
         calories: 0,
@@ -204,19 +204,17 @@ export function FoodLogDialog({
       ) : (
         <DialogTrigger
           className={`w-full h-full overflow-hidden p-1.5 sm:p-2 rounded-xl border transition-all text-left flex flex-col aspect-square
-          ${
-            isToday
+          ${isToday
               ? "border-emerald-500/50 dark:border-emerald-400/50 bg-emerald-500/10 dark:bg-emerald-400/10"
               : "border-border hover:border-primary/50 bg-card/50"
-          }
+            }
           ${hasData ? "hover:bg-accent/10" : "hover:bg-card"}`}
         >
           <span
-            className={`text-xs sm:text-sm font-medium ${
-              isToday
+            className={`text-xs sm:text-sm font-medium ${isToday
                 ? "text-emerald-600 dark:text-emerald-400"
                 : "text-muted-foreground"
-            }`}
+              }`}
           >
             {day}
           </span>
@@ -257,12 +255,13 @@ export function FoodLogDialog({
         </DialogTrigger>
       )}
       <DialogContent
-        className="bg-card border border-border top-auto bottom-0 max-h-[90vh] w-full max-w-none rounded-b-none rounded-t-2xl p-0 gap-0 overflow-hidden flex flex-col -translate-y-0 sm:max-w-none md:top-1/2 md:bottom-auto md:w-[40rem] md:max-w-[40rem] md:rounded-2xl md:-translate-y-1/2"
+        variant="responsive"
+        className="bg-card border border-border"
         showCloseButton={false}
       >
         <div className="p-5 border-b border-border flex items-center justify-between">
           <div>
-            <DialogTitle className="text-lg font-semibold text-foreground">
+            <DialogTitle className="text-lg text-foreground">
               {formattedDate}
             </DialogTitle>
             <p className="text-sm text-muted-foreground">
@@ -275,7 +274,7 @@ export function FoodLogDialog({
                     : "No entries"}
             </p>
           </div>
-          <DialogClose className="p-2 hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 rounded-lg transition-colors relative top-0 right-0">
+          <DialogClose className="p-2 hover:bg-muted dark:hover:bg-muted/50 rounded-lg transition-colors relative top-0 right-0">
             <X size={20} className="text-muted-foreground" />
           </DialogClose>
         </div>
@@ -371,13 +370,12 @@ export function FoodLogDialog({
                         </div>
                       </div>
                       <div
-                        className={`text-sm font-medium px-2 py-1 rounded-full ${
-                          calPct >= 90 && calPct <= 110
+                        className={`text-sm font-medium px-2 py-1 rounded-full ${calPct >= 90 && calPct <= 110
                             ? "bg-emerald-500/20 dark:bg-emerald-400/20 text-emerald-600 dark:text-emerald-400"
                             : calPct < 90
                               ? "bg-amber-500/20 dark:bg-amber-400/20 text-amber-600 dark:text-amber-400"
                               : "bg-rose-500/20 dark:bg-rose-400/20 text-rose-600 dark:text-rose-400"
-                        }`}
+                          }`}
                       >
                         {calPct}%
                       </div>
@@ -480,11 +478,10 @@ export function FoodLogDialog({
                               {label}
                             </span>
                             <span
-                              className={`text-sm font-medium ${
-                                value > 0
+                              className={`text-sm font-medium ${value > 0
                                   ? "text-foreground"
                                   : "text-muted-foreground/50"
-                              }`}
+                                }`}
                             >
                               {value}{" "}
                               <span className="text-muted-foreground">{unit}</span>

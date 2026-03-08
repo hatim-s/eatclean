@@ -73,13 +73,8 @@ export function WeeklyWidget({
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-sm">This Week</CardTitle>
           <Badge
-            className={cn(
-              "h-5 gap-1 px-1.5 text-[10px]",
-              isWeeklyTargetMet
-                ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                : "bg-amber-500/15 text-amber-700 dark:text-amber-300"
-            )}
-            variant="secondary"
+            className="rounded-full px-2.5 py-1 font-semibold"
+            variant="success"
           >
             <TrendingUp className="size-3" />
             {isWeeklyTargetMet ? "On track" : "Off track"}

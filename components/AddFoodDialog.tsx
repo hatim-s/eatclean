@@ -181,17 +181,18 @@ export function AddFoodDialog({
         </DialogTrigger>
       ) : null}
       <DialogContent
-        className="bg-card border-border top-auto bottom-0 max-h-[90vh] w-full max-w-none rounded-b-none rounded-t-2xl p-0 flex flex-col gap-0 overflow-hidden translate-y-0 sm:max-w-none md:top-1/2 md:bottom-auto md:w-lg md:max-w-lg md:rounded-2xl md:-translate-y-1/2"
+        variant="responsive"
+        className="bg-card border-border md:w-lg md:max-w-lg"
         showCloseButton={false}
       >
         <div className="p-4 border-b border-border flex items-center justify-between">
           <div>
-            <DialogTitle className="text-lg font-semibold text-foreground">
+            <DialogTitle className="text-lg text-foreground">
               Log Food
             </DialogTitle>
             <p className="text-sm text-muted-foreground">{formattedDate}</p>
           </div>
-          <DialogClose className="p-2 hover:bg-muted hover:text-foreground rounded-lg transition-colors">
+          <DialogClose className="p-2 hover:bg-muted rounded-lg transition-colors">
             <X size={20} className="text-muted-foreground" />
           </DialogClose>
         </div>
@@ -203,19 +204,16 @@ export function AddFoodDialog({
             </label>
             <div className="flex gap-1.5">
               {MEAL_TYPES.map(({ value, label }) => (
-                <button
+                <Button
                   key={value}
                   type="button"
+                  variant={mealType === value ? "default" : "muted"}
+                  size="xs"
+                  className="flex-1"
                   onClick={() => setMealType(value)}
-                  className={cn(
-                    "flex-1 py-1.5 px-2 text-xs font-medium rounded-lg transition-colors",
-                    mealType === value
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80",
-                  )}
                 >
                   {label}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -229,7 +227,8 @@ export function AddFoodDialog({
                   placeholder='Describe what you ate...
 
 e.g. "2 scrambled eggs with toast and a glass of orange juice" or "chicken salad with about 150g grilled chicken, mixed greens, tomatoes, and olive oil dressing"'
-                  className="w-full h-32 bg-muted/50 border-border rounded-xl px-4 py-3 text-foreground placeholder-muted-foreground text-sm resize-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                  variant="filled"
+                  className="w-full h-32 resize-none text-foreground placeholder-muted-foreground text-sm"
                 />
                 <div className="absolute bottom-3 right-3 flex items-center gap-2">
                   <Sparkles size={14} className="text-muted-foreground" />
@@ -245,7 +244,8 @@ e.g. "2 scrambled eggs with toast and a glass of orange juice" or "chicken salad
               <Button
                 onClick={handleSubmit}
                 disabled={!prompt.trim() || isProcessing}
-                className="w-full py-3"
+                size="lg"
+                className="w-full"
               >
                 {isProcessing ? (
                   <>
@@ -260,13 +260,15 @@ e.g. "2 scrambled eggs with toast and a glass of orange juice" or "chicken salad
                 )}
               </Button>
 
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="xs"
                 onClick={() => setMode("manual")}
-                className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors py-1"
+                className="w-full text-muted-foreground"
               >
                 or enter items manually
-              </button>
+              </Button>
             </div>
           ) : (
             <div className="space-y-3">
@@ -282,7 +284,8 @@ e.g. "2 scrambled eggs with toast and a glass of orange juice" or "chicken salad
                             updateManualItem(index, "food", e.target.value)
                           }
                           placeholder="Food name (e.g. chicken breast)"
-                          className="bg-muted/50 border-border rounded-lg px-3 py-2 text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-primary"
+                          variant="filled"
+                          className="text-foreground placeholder-muted-foreground text-sm"
                         />
                         <Input
                           type="text"
@@ -291,17 +294,20 @@ e.g. "2 scrambled eggs with toast and a glass of orange juice" or "chicken salad
                             updateManualItem(index, "quantity", e.target.value)
                           }
                           placeholder="Quantity (e.g. 150g, 1 cup, 2 pieces)"
-                          className="bg-muted/50 border-border rounded-lg px-3 py-2 text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-primary"
+                          variant="filled"
+                          className="text-foreground placeholder-muted-foreground text-sm"
                         />
                       </div>
                       {manualItems.length > 1 && (
-                        <button
+                        <Button
                           type="button"
+                          variant="destructive-ghost"
+                          size="icon-sm"
                           onClick={() => removeManualItem(index)}
-                          className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors mt-1"
+                          className="mt-1"
                         >
                           <Trash2 size={16} />
-                        </button>
+                        </Button>
                       )}
                     </div>
                   ))}
@@ -327,7 +333,8 @@ e.g. "2 scrambled eggs with toast and a glass of orange juice" or "chicken salad
               <Button
                 onClick={handleSubmit}
                 disabled={!hasValidManualItems || isProcessing}
-                className="w-full py-3"
+                size="xl"
+                className="w-full"
               >
                 {isProcessing ? (
                   <>
@@ -351,14 +358,16 @@ e.g. "2 scrambled eggs with toast and a glass of orange juice" or "chicken salad
                 )}
               </Button>
 
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="xs"
                 onClick={() => setMode("ai")}
-                className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors py-1 flex items-center justify-center gap-1"
+                className="w-full text-muted-foreground"
               >
-                <Sparkles size={12} />
+                <Sparkles size={12} className="mr-1" />
                 use AI input instead
-              </button>
+              </Button>
             </div>
           )}
         </div>

@@ -65,7 +65,7 @@ const legendToneClassName = {
 
 function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
   return (
-    <Card className="w-full max-w-sm border-border bg-card/95 py-5 shadow-2xl">
+    <Card variant="elevated" className="w-full max-w-sm py-5 px-0">
       <CardHeader className="space-y-4 pb-0">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-semibold text-card-foreground">
@@ -74,7 +74,6 @@ function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
           <div className="flex gap-1">
             <Button
               aria-label="Previous month"
-              className="size-6 rounded-md border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               size="icon-xs"
               variant="outline"
             >
@@ -82,7 +81,6 @@ function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
             </Button>
             <Button
               aria-label="Next month"
-              className="size-6 rounded-md border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               size="icon-xs"
               variant="outline"
             >
@@ -306,8 +304,8 @@ export function HeroSection({
         <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16">
           <div className="flex-1 text-center lg:text-left">
             <Badge
-              className="border-amber-500/30 bg-amber-500/10 px-3 py-1 text-amber-600 dark:text-amber-300"
-              variant="outline"
+              className="px-3 py-1"
+              variant="brand-outline"
             >
               <Sparkles className="size-3.5" />
               {badgeText}
@@ -512,7 +510,7 @@ export function NutritionSection({
 
         <div className="mx-auto mt-16 grid max-w-4xl gap-6 md:grid-cols-2">
           {groups.map((group) => (
-            <Card className="border-border bg-card/60" key={group.title}>
+            <Card variant="glass" key={group.title}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-sm font-semibold text-card-foreground">
                   <ToneDot tone={group.tone} />
@@ -534,7 +532,7 @@ export function NutritionSection({
             </Card>
           ))}
 
-          <Card className="border-border bg-card/60">
+          <Card variant="glass">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-sm font-semibold text-card-foreground">
                 <ToneDot tone="amber" />
@@ -602,15 +600,15 @@ export function FaqSection({
       <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
         <SectionHeader title={title} />
 
-        <Card className="mt-12 border-border bg-card/60">
+        <Card variant="glass" className="mt-12">
           <CardContent className="pt-3">
             <Accordion defaultValue={["faq-0"]}>
               {items.map((item, index) => (
                 <AccordionItem key={item.question} value={`faq-${index}`}>
-                  <AccordionTrigger className="text-foreground hover:no-underline data-open:text-foreground">
+                  <AccordionTrigger>
                     {item.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">
+                  <AccordionContent>
                     {item.answer}
                   </AccordionContent>
                 </AccordionItem>

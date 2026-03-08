@@ -7,6 +7,7 @@ import { cn } from "@/ui/lib/utils";
 import { deleteFoodLog } from "@/actions/db/foodLog";
 import { useRouter } from "next/navigation";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
+import { Button } from "@/ui/components/base/button";
 
 const MEAL_TYPE_CONFIG = {
   breakfast: { label: "Breakfast", color: "bg-purple-500/20 text-purple-600 dark:text-purple-400 border-purple-500/20" },
@@ -64,12 +65,13 @@ export function FoodLogEntryCard({ entry, onDeleted }: FoodLogEntryCardProps) {
               <span className="text-xs text-muted-foreground">
                 {formatTime(entry.createdAt)}
               </span>
-              <button
+              <Button
+                variant="ghost"
+                size="icon-sm"
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="p-1.5 hover:bg-muted rounded-md transition-colors"
               >
                 {isExpanded ? <ChevronUp size={14} className="text-muted-foreground" /> : <ChevronDown size={14} className="text-muted-foreground" />}
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -109,13 +111,14 @@ export function FoodLogEntryCard({ entry, onDeleted }: FoodLogEntryCardProps) {
               </div>
             </div>
 
-            <button
+            <Button
+              variant="destructive-ghost"
+              size="icon-sm"
               onClick={() => setShowDeleteDialog(true)}
               disabled={isDeleting}
-              className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
             >
               <Trash2 size={14} />
-            </button>
+            </Button>
           </div>
 
           {isExpanded && (

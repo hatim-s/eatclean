@@ -39,23 +39,42 @@ function DialogOverlay({
   )
 }
 
+import { cva, type VariantProps } from "class-variance-authority"
+
+const dialogContentVariants = cva(
+  "bg-background data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 ring-foreground/10 ring-1 duration-100 fixed left-1/2 z-50 -translate-x-1/2 outline-none isolate",
+  {
+    variants: {
+      variant: {
+        /** The standard dialog style that mimics a centered modal on all screen sizes. */
+        default: "top-1/2 -translate-y-1/2 w-full max-w-[calc(100%-2rem)] sm:max-w-sm rounded-xl data-closed:zoom-out-95 data-open:zoom-in-95 grid gap-4 p-4 text-sm",
+        /** A responsive dialog that acts as a bottom sheet on mobile screens and a centered modal on desktop screens. */
+        responsive: "top-auto bottom-0 max-h-[90vh] w-full max-w-none rounded-b-none rounded-t-2xl translate-y-0 sm:max-w-none md:top-1/2 md:bottom-auto md:w-[40rem] md:max-w-[40rem] md:rounded-2xl md:-translate-y-1/2 data-closed:slide-out-to-bottom-1/2 data-open:slide-in-from-bottom-1/2 md:data-closed:slide-out-to-bottom-0 md:data-open:slide-in-from-bottom-0 md:data-closed:zoom-out-95 md:data-open:zoom-in-95 p-0 gap-0 overflow-hidden flex flex-col"
+      }
+    },
+    defaultVariants: {
+      variant: "default"
+    }
+  }
+)
+
+export interface DialogContentProps extends DialogPrimitive.Popup.Props, VariantProps<typeof dialogContentVariants> {
+  showCloseButton?: boolean
+}
+
 function DialogContent({
   className,
   children,
   showCloseButton = true,
+  variant,
   ...props
-}: DialogPrimitive.Popup.Props & {
-  showCloseButton?: boolean
-}) {
+}: DialogContentProps) {
   return (
     <DialogPortal>
       <DialogOverlay />
       <DialogPrimitive.Popup
         data-slot="dialog-content"
-        className={cn(
-          "bg-background data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 ring-foreground/10 grid max-w-[calc(100%-2rem)] gap-4 rounded-xl p-4 text-sm ring-1 duration-100 sm:max-w-sm fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2 outline-none isolate",
-          className
-        )}
+        className={cn(dialogContentVariants({ variant }), className)}
         {...props}
       >
         {children}

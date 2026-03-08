@@ -97,7 +97,7 @@ export function FeatureCard({ feature }: { feature: FeatureItem }) {
   const Icon = feature.icon;
 
   return (
-    <Card className="border-border bg-card/60 transition-colors hover:border-border/80 hover:bg-card">
+    <Card variant="interactive">
       <CardHeader className="space-y-3">
         <span
           className={cn(

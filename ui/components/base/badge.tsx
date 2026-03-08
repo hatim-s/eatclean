@@ -9,11 +9,21 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
+        /** The primary badge style for general highlights and counts. */
         default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
+        /** A secondary badge style for less prominent information. */
         secondary: "bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80",
+        /** A badge used to indicate errors, alerts, or destructive states. */
         destructive: "bg-destructive/10 [a]:hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 text-destructive dark:bg-destructive/20",
+        /** A badge with a border and no background, suitable for tags. */
         outline: "border-border text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground",
+        /** A branded, highlighted outline badge for premium or special tags. */
+        "brand-outline": "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-300",
+        /** A badge used to indicate successful states or positive trends. */
+        success: "bg-emerald-500/20 text-emerald-600 dark:bg-emerald-400/20 dark:text-emerald-400",
+        /** A subtle, background-less badge for minor metadata. */
         ghost: "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
+        /** A badge that looks like a subtle text link. */
         link: "text-primary underline-offset-4 hover:underline",
       },
     },

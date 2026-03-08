@@ -1,17 +1,44 @@
 import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/ui/lib/utils"
+
+const cardVariants = cva(
+  "ring-foreground/10 text-card-foreground gap-4 overflow-hidden rounded-xl py-4 text-sm ring-1 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col",
+  {
+    variants: {
+      variant: {
+        /** The default, flat card style with a standard border and background. */
+        default: "bg-card border-border",
+        /** A semi-transparent card with a backdrop blur, good for floating or layered elements. */
+        glass: "bg-card/60 border-border backdrop-blur-md",
+        /** A card that provides visual feedback on hover, useful for clickable card elements. */
+        interactive: "bg-card/60 border-border transition-colors hover:border-border/80 hover:bg-card",
+        /** A highly elevated card with a strong shadow, used for prominent overlays or featured sections. */
+        elevated: "bg-card shadow-2xl shadow-black/10 dark:shadow-black/35 backdrop-blur-xl border-border/80 py-0",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+export interface CardProps extends React.ComponentProps<"div">, VariantProps<typeof cardVariants> {
+  size?: "default" | "sm"
+}
 
 function Card({
   className,
   size = "default",
+  variant = "default",
   ...props
-}: React.ComponentProps<"div"> & { size?: "default" | "sm" }) {
+}: CardProps) {
   return (
     <div
       data-slot="card"
       data-size={size}
-      className={cn("ring-foreground/10 bg-card text-card-foreground gap-4 overflow-hidden rounded-xl py-4 text-sm ring-1 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl group/card flex flex-col", className)}
+      className={cn(cardVariants({ variant }), className)}
       {...props}
     />
   )
