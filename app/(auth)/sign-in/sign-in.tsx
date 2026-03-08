@@ -22,7 +22,7 @@ import { ThemeToggle } from "@/ui/components/theme-toggle";
 
 export default function SignInPage() {
   return (
-    <div className="landing-v2 relative min-h-screen overflow-hidden bg-zinc-950 text-zinc-100">
+    <div className="landing-v2 relative min-h-screen overflow-hidden bg-background text-foreground">
       <div className="absolute right-4 top-4 z-50">
         <ThemeToggle />
       </div>
@@ -35,18 +35,18 @@ export default function SignInPage() {
             <div className="flex size-10 items-center justify-center rounded-xl bg-linear-to-br from-amber-400 to-amber-600 text-zinc-900 shadow-lg shadow-amber-500/20">
               <LeafIcon className="size-5" />
             </div>
-            <span className="text-2xl font-semibold tracking-tight text-white">
-              Eat<span className="text-amber-400">Clean</span>
+            <span className="text-2xl font-semibold tracking-tight text-foreground">
+              Eat<span className="text-amber-600 dark:text-amber-400">Clean</span>
             </span>
           </div>
 
           <div className="space-y-3">
-            <h1 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">
+            <h1 className="text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
               Track nutrition
               <br />
-              <span className="text-amber-400">effortlessly</span> with AI
+              <span className="text-amber-600 dark:text-amber-400">effortlessly</span> with AI
             </h1>
-            <p className="text-base leading-relaxed text-zinc-400">
+            <p className="text-base leading-relaxed text-muted-foreground">
               Describe meals in plain language and get instant nutrition insights
               from USDA-backed data.
             </p>
@@ -54,15 +54,15 @@ export default function SignInPage() {
         </section>
 
         <section className="w-full">
-          <Card className="border-zinc-800/80 bg-zinc-900/85 py-0 shadow-2xl shadow-black/35 backdrop-blur-xl">
+          <Card className="border-border/80 bg-card py-0 shadow-2xl shadow-black/10 dark:shadow-black/35 backdrop-blur-xl">
             <CardHeader className="space-y-2 px-6 pt-6 text-center">
-              <CardTitle className="text-2xl font-semibold text-white">Welcome back</CardTitle>
-              <CardDescription className="text-zinc-400">
+              <CardTitle className="text-2xl font-semibold text-foreground">Welcome back</CardTitle>
+              <CardDescription className="text-muted-foreground">
                 Sign in to continue tracking your nutrition
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 px-6 pb-6">
-              <div className="h-px bg-linear-to-r from-transparent via-zinc-700 to-transparent" />
+              <div className="h-px bg-linear-to-r from-transparent via-border to-transparent" />
 
               <Button
                 className="h-11 w-full justify-center gap-2 rounded-xl bg-linear-to-br from-amber-400 to-amber-600 text-zinc-900 hover:from-amber-300 hover:to-amber-500"
@@ -85,7 +85,7 @@ export default function SignInPage() {
               </div>
 
               <Button
-                className="h-11 w-full justify-center gap-2 rounded-xl border-zinc-700 bg-zinc-800 text-zinc-200 hover:bg-zinc-700"
+                className="h-11 w-full justify-center gap-2 rounded-xl border-border bg-card text-foreground hover:bg-accent hover:text-accent-foreground"
                 type="button"
                 variant="outline"
                 onClick={async () => {
@@ -105,21 +105,21 @@ export default function SignInPage() {
               </Button>
 
               <div className="space-y-3 pt-1">
-                <div className="flex items-center gap-3 text-xs text-zinc-400">
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <div className="flex size-6 items-center justify-center rounded-md bg-amber-500/12">
-                    <SparklesIcon className="size-3.5 text-amber-400" />
+                    <SparklesIcon className="size-3.5 text-amber-600 dark:text-amber-400" />
                   </div>
                   AI-powered natural language food logging
                 </div>
-                <div className="flex items-center gap-3 text-xs text-zinc-400">
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <div className="flex size-6 items-center justify-center rounded-md bg-amber-500/12">
-                    <BarChart3Icon className="size-3.5 text-amber-400" />
+                    <BarChart3Icon className="size-3.5 text-amber-600 dark:text-amber-400" />
                   </div>
                   30+ nutrients tracked from USDA data
                 </div>
-                <div className="flex items-center gap-3 text-xs text-zinc-400">
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <div className="flex size-6 items-center justify-center rounded-md bg-amber-500/12">
-                    <ShieldCheckIcon className="size-3.5 text-amber-400" />
+                    <ShieldCheckIcon className="size-3.5 text-amber-600 dark:text-amber-400" />
                   </div>
                   Private, secure, zero cost
                 </div>
@@ -127,7 +127,7 @@ export default function SignInPage() {
             </CardContent>
           </Card>
 
-          <FieldDescription className="mx-auto mt-5! max-w-sm px-2 text-center text-xs text-zinc-500">
+          <FieldDescription className="mx-auto mt-5! max-w-sm px-2 text-center text-xs text-muted-foreground">
             By continuing, you agree to our <a href="#">Terms of Service</a> and{" "}
             <a href="#">Privacy Policy</a>.
           </FieldDescription>

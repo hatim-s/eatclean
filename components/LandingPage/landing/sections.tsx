@@ -65,16 +65,16 @@ const legendToneClassName = {
 
 function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
   return (
-    <Card className="w-full max-w-sm border-zinc-800 bg-zinc-900/95 py-5 shadow-2xl">
+    <Card className="w-full max-w-sm border-border bg-card/95 py-5 shadow-2xl">
       <CardHeader className="space-y-4 pb-0">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm font-semibold text-zinc-100">
+          <CardTitle className="text-sm font-semibold text-card-foreground">
             {data.monthLabel}
           </CardTitle>
           <div className="flex gap-1">
             <Button
               aria-label="Previous month"
-              className="size-6 rounded-md border-zinc-700 bg-zinc-800/90 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-100"
+              className="size-6 rounded-md border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               size="icon-xs"
               variant="outline"
             >
@@ -82,7 +82,7 @@ function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
             </Button>
             <Button
               aria-label="Next month"
-              className="size-6 rounded-md border-zinc-700 bg-zinc-800/90 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-100"
+              className="size-6 rounded-md border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               size="icon-xs"
               variant="outline"
             >
@@ -93,10 +93,10 @@ function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
       </CardHeader>
       <CardContent className="space-y-2 px-5">
         <div className="grid grid-cols-7 gap-1">
-          {data.weekdays.map((day) => (
+          {data.weekdays.map((day, index) => (
             <span
-              className="py-1 text-center text-[10px] font-medium text-zinc-500"
-              key={day}
+              className="py-1 text-center text-[10px] font-medium text-muted-foreground"
+              key={`day-${index}`}
             >
               {day}
             </span>
@@ -122,8 +122,8 @@ function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
                   isCurrentDay
                     ? "bg-amber-500/10 ring-1 ring-amber-500"
                     : calories
-                      ? "bg-zinc-800/70 hover:bg-zinc-800"
-                      : "bg-zinc-800/20",
+                      ? "bg-muted/70 hover:bg-muted"
+                      : "bg-muted/20",
                 )}
                 key={`day-${day}`}
               >
@@ -133,14 +133,14 @@ function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
                     isCurrentDay
                       ? "text-amber-300"
                       : calories
-                        ? "text-zinc-300"
-                        : "text-zinc-600",
+                        ? "text-foreground"
+                        : "text-muted-foreground",
                   )}
                 >
                   {day}
                 </span>
                 {calories ? (
-                  <span className="h-[3px] w-4/5 overflow-hidden rounded-full bg-zinc-700">
+                  <span className="h-[3px] w-4/5 overflow-hidden rounded-full bg-secondary">
                     <span
                       className="block h-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-300"
                       style={{ width: `${dayProgress}%` }}
@@ -152,7 +152,7 @@ function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
           })}
         </div>
 
-        <div className="flex items-center justify-center gap-4 pt-2 text-[10px] text-zinc-500">
+        <div className="flex items-center justify-center gap-4 pt-2 text-[10px] text-muted-foreground">
           {data.legend.map((item) => (
             <span className="inline-flex items-center gap-1" key={item.label}>
               <span
@@ -184,21 +184,21 @@ export function LandingNavigation({
   onCloseMobileMenu,
 }: LandingNavigationProps) {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-zinc-800/60 bg-zinc-950/85 backdrop-blur-xl">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-xl">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link className="flex items-center gap-2" href="/">
-          <span className="inline-flex size-8 items-center justify-center rounded-lg bg-amber-500/20 text-amber-300">
+          <span className="inline-flex size-8 items-center justify-center rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-300">
             <Leaf className="size-4" />
           </span>
-          <span className="bg-linear-to-r from-amber-400 to-yellow-200 bg-clip-text text-lg font-semibold text-transparent">
+          <span className="bg-linear-to-r from-amber-600 to-amber-500 dark:from-amber-400 dark:to-yellow-200 bg-clip-text text-lg font-semibold text-transparent">
             EatClean
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-8 text-sm text-zinc-400 md:flex">
+        <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
           {items.map((item) => (
             <a
-              className="transition-colors hover:text-zinc-100"
+              className="transition-colors hover:text-foreground"
               href={item.href}
               key={item.href}
             >
@@ -213,20 +213,20 @@ export function LandingNavigation({
             className={buttonVariants({
               size: "sm",
               className:
-                "hidden sm:inline-flex border-white bg-white text-zinc-900 hover:bg-zinc-100",
+                "hidden sm:inline-flex border-border bg-foreground text-background hover:bg-foreground/90",
             })}
             href="/sign-in"
           >
-            <Github className="size-3.5" />
-            Sign in with GitHub
+            Sign in
+            <ArrowRight className="size-4" />
           </Link>
-          <Button
+          {/* <Button
             aria-label={
               isMobileMenuOpen
                 ? "Close navigation menu"
                 : "Open navigation menu"
             }
-            className="text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 md:hidden"
+            className="text-muted-foreground hover:bg-accent hover:text-accent-foreground md:hidden"
             onClick={onToggleMobileMenu}
             size="icon-sm"
             variant="ghost"
@@ -236,16 +236,16 @@ export function LandingNavigation({
             ) : (
               <Menu className="size-4" />
             )}
-          </Button>
+          </Button> */}
         </div>
       </div>
 
       {isMobileMenuOpen ? (
-        <div className="border-t border-zinc-800 bg-zinc-950/95 px-4 py-4 backdrop-blur-xl md:hidden">
+        <div className="border-t border-border bg-background/95 px-4 py-4 backdrop-blur-xl md:hidden">
           <nav className="flex flex-col gap-3">
             {items.map((item) => (
               <a
-                className="py-2 text-sm text-zinc-300 transition-colors hover:text-zinc-100"
+                className="py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
                 href={item.href}
                 key={`mobile-${item.href}`}
                 onClick={onCloseMobileMenu}
@@ -257,7 +257,7 @@ export function LandingNavigation({
               className={buttonVariants({
                 size: "default",
                 className:
-                  "mt-1 justify-center border-white bg-white text-zinc-900 hover:bg-zinc-100",
+                  "mt-1 justify-center border-border bg-foreground text-background hover:bg-foreground/90",
               })}
               href="/sign-in"
               onClick={onCloseMobileMenu}
@@ -294,7 +294,7 @@ export function HeroSection({
   calendarData,
 }: HeroSectionProps) {
   return (
-    <section className="relative overflow-hidden border-b border-zinc-800/60 pb-20 pt-32 sm:pb-28 sm:pt-40">
+    <section className="relative overflow-hidden border-b border-border/60 pb-20 pt-32 sm:pb-28 sm:pt-40">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="landing-v2-glow absolute left-1/4 top-20 size-96 rounded-full bg-amber-500/10 blur-3xl" />
         <div
@@ -306,21 +306,21 @@ export function HeroSection({
         <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16">
           <div className="flex-1 text-center lg:text-left">
             <Badge
-              className="border-amber-500/30 bg-amber-500/10 px-3 py-1 text-amber-300"
+              className="border-amber-500/30 bg-amber-500/10 px-3 py-1 text-amber-600 dark:text-amber-300"
               variant="outline"
             >
               <Sparkles className="size-3.5" />
               {badgeText}
             </Badge>
 
-            <h1 className="mt-6 text-4xl font-semibold leading-tight text-zinc-50 sm:text-5xl lg:text-6xl">
+            <h1 className="mt-6 text-4xl font-semibold leading-tight text-foreground sm:text-5xl lg:text-6xl">
               {titlePrefix}{" "}
-              <span className="bg-gradient-to-r from-amber-300 via-yellow-200 to-orange-300 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-amber-600 via-amber-500 to-orange-500 dark:from-amber-300 dark:via-yellow-200 dark:to-orange-300 bg-clip-text text-transparent">
                 {titleHighlight}
               </span>
             </h1>
 
-            <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-zinc-400 lg:mx-0">
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground lg:mx-0">
               {description}
             </p>
 
@@ -329,7 +329,7 @@ export function HeroSection({
                 className={buttonVariants({
                   size: "lg",
                   className:
-                    "w-full sm:w-auto border-amber-500 bg-amber-500 text-zinc-950 hover:bg-amber-400",
+                    "w-full sm:w-auto border-amber-500 bg-amber-500 text-background hover:bg-amber-400",
                 })}
                 href="/sign-in"
               >
@@ -342,7 +342,7 @@ export function HeroSection({
                   size: "lg",
                   variant: "outline",
                   className:
-                    "w-full sm:w-auto border-zinc-700 bg-zinc-800/90 text-zinc-200 hover:bg-zinc-700",
+                    "w-full sm:w-auto border-border bg-card/90 text-card-foreground hover:bg-accent hover:text-accent-foreground",
                 })}
                 href="#demo"
               >
@@ -350,13 +350,13 @@ export function HeroSection({
               </a>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-zinc-500 lg:justify-start">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground lg:justify-start">
               {trustItems.map((item) => (
                 <span
                   className="inline-flex items-center gap-1.5"
                   key={item.label}
                 >
-                  <Check className="size-3.5 text-amber-400" />
+                  <Check className="size-3.5 text-amber-600 dark:text-amber-400" />
                   {item.label}
                 </span>
               ))}
@@ -374,12 +374,12 @@ export function HeroSection({
 
 export function StatsSection({ items }: { items: StatItem[] }) {
   return (
-    <section className="border-y border-zinc-800/60 bg-zinc-900/35">
+    <section className="border-y border-border/60 bg-muted/35">
       <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
         <div className="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
           {items.map((item) => (
             <div key={item.label}>
-              <div className="text-2xl font-semibold text-zinc-100 sm:text-3xl">
+              <div className="text-2xl font-semibold text-foreground sm:text-3xl">
                 <AnimatedCounter
                   className="tabular-nums"
                   prefix={item.prefix}
@@ -387,7 +387,7 @@ export function StatsSection({ items }: { items: StatItem[] }) {
                   value={item.value}
                 />
               </div>
-              <p className="mt-1 text-xs text-zinc-500">{item.label}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{item.label}</p>
             </div>
           ))}
         </div>
@@ -446,7 +446,7 @@ export function DemoSection({
 }: DemoSectionProps) {
   return (
     <section
-      className="border-y border-zinc-800/60 bg-zinc-900/35 py-20 sm:py-28"
+      className="border-y border-border/60 bg-muted/35 py-20 sm:py-28"
       id="demo"
     >
       <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-12 px-4 sm:px-6 lg:flex-row lg:gap-16">
@@ -460,18 +460,20 @@ export function DemoSection({
         </div>
 
         <div className="order-1 flex-1 text-center lg:order-2 lg:text-left">
-          <h2 className="text-3xl font-semibold text-zinc-50 sm:text-4xl">
+          <h2 className="text-3xl font-semibold text-foreground sm:text-4xl">
             {title}
           </h2>
-          <p className="mt-6 leading-relaxed text-zinc-400">{description}</p>
+          <p className="mt-6 leading-relaxed text-muted-foreground">
+            {description}
+          </p>
 
           <div className="mt-8 space-y-4 text-left">
             {steps.map((step) => (
               <div className="flex items-start gap-3" key={step}>
                 <span className="mt-0.5 inline-flex items-center justify-center rounded-full bg-amber-500/20 p-1">
-                  <Check className="size-3 text-amber-300" />
+                  <Check className="size-3 text-amber-600 dark:text-amber-300" />
                 </span>
-                <span className="text-sm text-zinc-300">{step}</span>
+                <span className="text-sm text-muted-foreground">{step}</span>
               </div>
             ))}
           </div>
@@ -510,9 +512,9 @@ export function NutritionSection({
 
         <div className="mx-auto mt-16 grid max-w-4xl gap-6 md:grid-cols-2">
           {groups.map((group) => (
-            <Card className="border-zinc-800 bg-zinc-900/60" key={group.title}>
+            <Card className="border-border bg-card/60" key={group.title}>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-zinc-200">
+                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-card-foreground">
                   <ToneDot tone={group.tone} />
                   {group.title}
                 </CardTitle>
@@ -532,30 +534,30 @@ export function NutritionSection({
             </Card>
           ))}
 
-          <Card className="border-zinc-800 bg-zinc-900/60">
+          <Card className="border-border bg-card/60">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-sm font-semibold text-zinc-200">
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold text-card-foreground">
                 <ToneDot tone="amber" />
                 Daily Summary
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="py-4 text-center">
-                <div className="text-4xl font-semibold text-zinc-50">
+                <div className="text-4xl font-semibold text-foreground">
                   {dailySummary.consumed.toLocaleString()}
                 </div>
-                <p className="mb-4 mt-1 text-sm text-zinc-500">
+                <p className="mb-4 mt-1 text-sm text-muted-foreground">
                   of {dailySummary.goal.toLocaleString()} kcal goal
                 </p>
                 <Progress
                   className="gap-0 [&>[data-slot=progress-track]:last-child]:hidden"
                   value={dailyProgress}
                 >
-                  <ProgressTrack className="h-3 bg-zinc-800">
+                  <ProgressTrack className="h-3 bg-muted">
                     <ProgressIndicator className="bg-gradient-to-r from-orange-500 to-amber-400" />
                   </ProgressTrack>
                 </Progress>
-                <p className="mt-2 text-xs text-zinc-500">
+                <p className="mt-2 text-xs text-muted-foreground">
                   {remainingCalories.toLocaleString()} kcal remaining
                 </p>
               </div>
@@ -575,7 +577,7 @@ export function HowItWorksSection({
   steps: HowItWorksStep[];
 }) {
   return (
-    <section className="border-y border-zinc-800/60 bg-zinc-900/35 py-20 sm:py-28">
+    <section className="border-y border-border/60 bg-muted/35 py-20 sm:py-28">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <SectionHeader title={title} />
         <div className="mx-auto mt-16 grid max-w-4xl gap-8 md:grid-cols-3">
@@ -600,15 +602,15 @@ export function FaqSection({
       <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
         <SectionHeader title={title} />
 
-        <Card className="mt-12 border-zinc-800 bg-zinc-900/60">
+        <Card className="mt-12 border-border bg-card/60">
           <CardContent className="pt-3">
             <Accordion defaultValue={["faq-0"]}>
               {items.map((item, index) => (
                 <AccordionItem key={item.question} value={`faq-${index}`}>
-                  <AccordionTrigger className="text-zinc-200 hover:no-underline data-[open]:text-zinc-100">
+                  <AccordionTrigger className="text-foreground hover:no-underline data-open:text-foreground">
                     {item.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-zinc-400">
+                  <AccordionContent className="text-muted-foreground">
                     {item.answer}
                   </AccordionContent>
                 </AccordionItem>
@@ -629,21 +631,23 @@ export function CtaSection({
   description: string;
 }) {
   return (
-    <section className="border-t border-zinc-800/60 bg-zinc-900/35 py-20 sm:py-28">
+    <section className="border-t border-border/60 bg-muted/35 py-20 sm:py-28">
       <div className="mx-auto w-full max-w-2xl px-4 text-center sm:px-6">
-        <span className="mb-6 inline-flex rounded-2xl bg-amber-500/10 p-3 text-amber-300">
+        <span className="mb-6 inline-flex rounded-2xl bg-amber-500/10 p-3 text-amber-600 dark:text-amber-300">
           <Leaf className="size-8" />
         </span>
-        <h2 className="text-3xl font-semibold text-zinc-50 sm:text-4xl">
+        <h2 className="text-3xl font-semibold text-foreground sm:text-4xl">
           {title}
         </h2>
-        <p className="mx-auto mt-4 max-w-md text-zinc-400">{description}</p>
+        <p className="mx-auto mt-4 max-w-md text-muted-foreground">
+          {description}
+        </p>
 
         <Link
           className={buttonVariants({
             size: "lg",
             className:
-              "mt-8 border-amber-500 bg-amber-500 text-zinc-950 hover:bg-amber-400",
+              "mt-8 border-amber-500 bg-amber-500 text-background hover:bg-amber-400",
           })}
           href="/sign-in"
         >
@@ -657,15 +661,17 @@ export function CtaSection({
 
 export function LandingFooter({ note }: { note: string }) {
   return (
-    <footer className="border-t border-zinc-800/60">
+    <footer className="border-t border-border/60">
       <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6">
         <div className="inline-flex items-center gap-2">
-          <span className="inline-flex size-6 items-center justify-center rounded-md bg-amber-500/20 text-amber-300">
+          <span className="inline-flex size-6 items-center justify-center rounded-md bg-amber-500/20 text-amber-600 dark:text-amber-300">
             <Leaf className="size-3.5" />
           </span>
-          <span className="text-sm font-semibold text-zinc-400">EatClean</span>
+          <span className="text-sm font-semibold text-muted-foreground">
+            EatClean
+          </span>
         </div>
-        <p className="text-center text-xs text-zinc-600 sm:text-right">
+        <p className="text-center text-xs text-muted-foreground sm:text-right">
           {note}
         </p>
       </div>

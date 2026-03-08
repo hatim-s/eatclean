@@ -50,7 +50,7 @@ export function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="landing-v2 min-h-screen bg-zinc-950 text-zinc-100">
+    <div className="landing-v2 min-h-screen bg-background text-foreground">
       <LandingNavigation
         isMobileMenuOpen={mobileMenuOpen}
         items={NAV_ITEMS}

@@ -48,11 +48,11 @@ function usePrefersReducedMotion() {
 }
 
 const featureToneClasses: Record<FeatureTone, string> = {
-  violet: "border-violet-500/20 bg-violet-500/10 text-violet-300",
-  emerald: "border-amber-500/20 bg-amber-500/10 text-amber-300",
-  amber: "border-amber-500/20 bg-amber-500/10 text-amber-300",
-  cyan: "border-cyan-500/20 bg-cyan-500/10 text-cyan-300",
-  rose: "border-rose-500/20 bg-rose-500/10 text-rose-300",
+  violet: "border-violet-500/20 bg-violet-500/10 text-violet-600 dark:text-violet-300",
+  emerald: "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300",
+  amber: "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300",
+  cyan: "border-cyan-500/20 bg-cyan-500/10 text-cyan-600 dark:text-cyan-300",
+  rose: "border-rose-500/20 bg-rose-500/10 text-rose-600 dark:text-rose-300",
 };
 
 const nutrientToneClasses: Record<NutrientTone, string> = {
@@ -81,11 +81,11 @@ export function SectionHeader({
 }: SectionHeaderProps) {
   return (
     <div className={cn("mx-auto max-w-2xl text-center", className)}>
-      <h2 className="text-3xl font-semibold text-zinc-50 sm:text-4xl">
+      <h2 className="text-3xl font-semibold text-foreground sm:text-4xl">
         {title}
       </h2>
       {description ? (
-        <p className={cn("mt-4 text-zinc-400", descriptionClassName)}>
+        <p className={cn("mt-4 text-muted-foreground", descriptionClassName)}>
           {description}
         </p>
       ) : null}
@@ -97,7 +97,7 @@ export function FeatureCard({ feature }: { feature: FeatureItem }) {
   const Icon = feature.icon;
 
   return (
-    <Card className="border-zinc-800 bg-zinc-900/60 transition-colors hover:border-zinc-700 hover:bg-zinc-900">
+    <Card className="border-border bg-card/60 transition-colors hover:border-border/80 hover:bg-card">
       <CardHeader className="space-y-3">
         <span
           className={cn(
@@ -107,8 +107,8 @@ export function FeatureCard({ feature }: { feature: FeatureItem }) {
         >
           <Icon className="size-5" />
         </span>
-        <CardTitle className="text-lg text-zinc-100">{feature.title}</CardTitle>
-        <CardDescription className="text-sm leading-relaxed text-zinc-400">
+        <CardTitle className="text-lg text-card-foreground">{feature.title}</CardTitle>
+        <CardDescription className="text-sm leading-relaxed text-muted-foreground">
           {feature.description}
         </CardDescription>
       </CardHeader>
@@ -119,11 +119,11 @@ export function FeatureCard({ feature }: { feature: FeatureItem }) {
 export function StepCard({ step }: { step: HowItWorksStep }) {
   return (
     <div className="text-center">
-      <div className="mb-4 inline-flex size-12 items-center justify-center rounded-2xl border border-amber-500/20 bg-amber-500/10 text-sm font-semibold text-amber-300">
+      <div className="mb-4 inline-flex size-12 items-center justify-center rounded-2xl border border-amber-500/20 bg-amber-500/10 text-sm font-semibold text-amber-600 dark:text-amber-300">
         {step.step}
       </div>
-      <h3 className="mb-2 text-lg font-semibold text-zinc-100">{step.title}</h3>
-      <p className="text-sm leading-relaxed text-zinc-400">
+      <h3 className="mb-2 text-lg font-semibold text-foreground">{step.title}</h3>
+      <p className="text-sm leading-relaxed text-muted-foreground">
         {step.description}
       </p>
     </div>
@@ -216,18 +216,18 @@ export function NutrientProgressRow({
 
   return (
     <div className={cn("flex items-center gap-3", className)}>
-      <span className="w-20 text-right text-xs text-zinc-400">{label}</span>
+      <span className="w-20 text-right text-xs text-muted-foreground">{label}</span>
       <Progress
         className="flex-1 gap-0 [&>[data-slot=progress-track]:last-child]:hidden"
         value={percentage}
       >
-        <ProgressTrack className="h-2 bg-zinc-800">
+        <ProgressTrack className="h-2 bg-muted">
           <ProgressIndicator className={nutrientToneClasses[tone]} />
         </ProgressTrack>
       </Progress>
-      <span className="w-16 text-xs text-zinc-300">
+      <span className="w-16 text-xs text-foreground">
         {value}
-        {unit} <span className="text-zinc-600">/ {max}</span>
+        {unit} <span className="text-muted-foreground">/ {max}</span>
       </span>
     </div>
   );
