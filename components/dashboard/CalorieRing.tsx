@@ -23,7 +23,10 @@ export function CalorieRing({
 
   return (
     <div
-      className={cn("relative inline-flex items-center justify-center", className)}
+      className={cn(
+        "relative inline-flex items-center justify-center",
+        className,
+      )}
       style={{ height: size, width: size }}
     >
       <svg
@@ -58,7 +61,7 @@ export function CalorieRing({
       </svg>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-        <span className="text-3xl font-semibold leading-none tabular-nums text-foreground">
+        <span className="text-xl font-semibold leading-none tabular-nums text-foreground">
           {Math.round(calories)}
         </span>
         <span className="mt-1 text-sm text-muted-foreground">/ {goal}</span>

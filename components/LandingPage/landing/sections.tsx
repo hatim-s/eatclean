@@ -288,7 +288,7 @@ export function HeroSection({
   calendarData,
 }: HeroSectionProps) {
   return (
-    <section className="relative overflow-hidden border-b border-border/60 pb-20 pt-32 sm:pb-28 sm:pt-40">
+    <section className="relative overflow-hidden pb-20 pt-32 sm:pb-28 sm:pt-40">
       {/* Dot pattern background */}
       <div className="pointer-events-none absolute inset-0 bg-dot-pattern mask-[radial-gradient(ellipse_90%_80%_at_50%_30%,black_40%,transparent)]" />
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -306,7 +306,7 @@ export function HeroSection({
               {badgeText}
             </Badge>
 
-            <h1 className="mt-6 text-4xl font-semibold leading-tight text-foreground sm:text-5xl lg:text-6xl">
+            <h1 className="mt-6 text-4xl font-semibold leading-tight text-foreground sm:text-5xl lg:text-6xl flex flex-col">
               {titlePrefix}{" "}
               <span className="bg-linear-to-r from-amber-600 via-amber-500 to-orange-500 dark:from-amber-300 dark:via-yellow-200 dark:to-orange-300 bg-clip-text text-transparent">
                 {titleHighlight}
@@ -367,7 +367,7 @@ export function HeroSection({
 
 export function StatsSection({ items }: { items: StatItem[] }) {
   return (
-    <section className="relative border-y border-border/60 bg-muted/35">
+    <section className="relative">
       {/* Crosshatch pattern */}
       <div className="pointer-events-none absolute inset-0 bg-crosshatch-pattern [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_80%,transparent)]" />
       <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
@@ -445,12 +445,9 @@ export function DemoSection({
   parsedItems,
 }: DemoSectionProps) {
   return (
-    <section
-      className="relative overflow-hidden border-y border-border/60 bg-muted/35 py-20 sm:py-28"
-      id="demo"
-    >
+    <section className="relative overflow-hidden py-20 sm:py-28" id="demo">
       {/* Crosshatch pattern */}
-      <div className="pointer-events-none absolute inset-0 bg-crosshatch-pattern [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]" />
+      <div className="pointer-events-none absolute inset-0 bg-crosshatch-pattern mask-[linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]" />
       {/* Accent glow */}
       <div className="pointer-events-none absolute left-1/4 top-0 size-[350px] rounded-full bg-amber-500/15 blur-[100px]" />
       <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center gap-12 px-4 sm:px-6 lg:flex-row lg:gap-16">
@@ -586,7 +583,7 @@ export function HowItWorksSection({
   steps: HowItWorksStep[];
 }) {
   return (
-    <section className="relative overflow-hidden border-y border-border/60 bg-muted/35 py-20 sm:py-28">
+    <section className="relative overflow-hidden py-20 sm:py-28">
       {/* Grid pattern */}
       <div className="pointer-events-none absolute inset-0 bg-grid-pattern [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]" />
       {/* Accent glow */}
@@ -644,7 +641,7 @@ export function CtaSection({
   description: string;
 }) {
   return (
-    <section className="relative overflow-hidden border-t border-border/60 bg-muted/35 py-20 sm:py-28">
+    <section className="relative overflow-hidden py-20 sm:py-28">
       {/* Dot pattern */}
       <div className="pointer-events-none absolute inset-0 bg-dot-pattern [mask-image:radial-gradient(ellipse_90%_70%_at_50%_40%,black_40%,transparent)]" />
       {/* Accent glows */}

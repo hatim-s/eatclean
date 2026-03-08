@@ -1,11 +1,23 @@
 "use client";
 
 import { format, isSameDay, parseISO } from "date-fns";
-import { Beef, Droplets, Flame, TrendingUp, Wheat } from "lucide-react";
+import {
+  Beef,
+  Droplets,
+  Flame,
+  TrendingDown,
+  TrendingUp,
+  Wheat,
+} from "lucide-react";
 import { FoodLogDialogWrapper } from "@/components/FoodLogDialogWrapper";
 import { FoodLog } from "@/types/db";
 import { Badge } from "@/ui/components/base/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/components/base/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/ui/components/base/card";
 import {
   Item,
   ItemActions,
@@ -18,6 +30,7 @@ import {
 import {
   Progress,
   ProgressIndicator,
+  ProgressRoot,
   ProgressTrack,
 } from "@/ui/components/base/progress";
 import { Separator } from "@/ui/components/base/separator";
@@ -65,7 +78,10 @@ export function WeeklyWidget({
   weeklyTarget: number;
   isWeeklyTargetMet: boolean;
 }) {
-  const progressValue = Math.min((weeklyAverage / Math.max(weeklyTarget, 1)) * 100, 100);
+  const progressValue = Math.min(
+    (weeklyAverage / Math.max(weeklyTarget, 1)) * 100,
+    100,
+  );
 
   return (
     <Card size="sm">
@@ -74,9 +90,13 @@ export function WeeklyWidget({
           <CardTitle className="text-sm">This Week</CardTitle>
           <Badge
             className="rounded-full px-2.5 py-1 font-semibold"
-            variant="success"
+            variant={isWeeklyTargetMet ? "success" : "error"}
           >
-            <TrendingUp className="size-3" />
+            {isWeeklyTargetMet ? (
+              <TrendingUp className="size-3" />
+            ) : (
+              <TrendingDown className="size-3" />
+            )}
             {isWeeklyTargetMet ? "On track" : "Off track"}
           </Badge>
         </div>
@@ -90,7 +110,7 @@ export function WeeklyWidget({
                 "rounded-md border px-0.5 py-1 text-center",
                 day.isElapsed
                   ? "border-border bg-muted/40"
-                  : "border-border/60 border-dashed bg-transparent"
+                  : "border-border/60 border-dashed bg-transparent",
               )}
             >
               <p className="text-[10px] text-muted-foreground">{day.label}</p>
@@ -101,17 +121,17 @@ export function WeeklyWidget({
           ))}
         </div>
 
-        <Progress className="gap-1" value={progressValue}>
-          <ProgressTrack className="h-1">
+        <ProgressRoot value={progressValue}>
+          <ProgressTrack className="h-3">
             <ProgressIndicator
               className={cn(
-                isWeeklyTargetMet ? "bg-emerald-500" : "bg-amber-500"
+                isWeeklyTargetMet ? "bg-emerald-500" : "bg-red-500",
               )}
             />
           </ProgressTrack>
-        </Progress>
+        </ProgressRoot>
 
-        <Separator className="my-0" />
+        <Separator className="mt-0 mb-4" />
 
         <div className="flex items-center justify-between text-[11px]">
           <span className="text-muted-foreground">Target</span>
@@ -120,7 +140,9 @@ export function WeeklyWidget({
 
         <div className="flex items-center justify-between text-[11px]">
           <span className="text-muted-foreground">Weekly avg</span>
-          <span className="font-semibold tabular-nums">{weeklyAverage} kcal</span>
+          <span className="font-semibold tabular-nums">
+            {weeklyAverage} kcal
+          </span>
         </div>
       </CardContent>
     </Card>
@@ -176,7 +198,7 @@ export function GoalsWidget() {
               <ItemMedia
                 className={cn(
                   "size-4 rounded-sm flex items-center justify-center",
-                  goal.iconBg
+                  goal.iconBg,
                 )}
               >
                 <goal.icon className={cn("size-3", goal.iconText)} />

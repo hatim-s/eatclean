@@ -28,9 +28,7 @@ import {
 import { useEffect, useMemo, useRef } from "react";
 import { cn } from "@/ui/lib/utils";
 import { Button } from "@/ui/components/base/button";
-import {
-  DailySummaryCard,
-} from "@/components/dashboard/DailySummaryCard";
+import { DailySummaryCard } from "@/components/dashboard/DailySummaryCard";
 
 import {
   GoalsWidget,
@@ -76,13 +74,16 @@ function getFeatureSnapshot(feature: Feature): MacroSnapshot {
 
 function getWeeklyMetrics(
   summaries: DailySummary[],
-  today: Date = new Date()
+  today: Date = new Date(),
 ): WeeklyMetrics {
   const weekStart = startOfWeek(today, { weekStartsOn: 1 });
-  const elapsedDays = Math.max(differenceInCalendarDays(today, weekStart) + 1, 1);
+  const elapsedDays = Math.max(
+    differenceInCalendarDays(today, weekStart) + 1,
+    1,
+  );
 
   const summaryByDate = new Map(
-    summaries.map((summary) => [summary.date, Math.round(summary.calories)])
+    summaries.map((summary) => [summary.date, Math.round(summary.calories)]),
   );
 
   const days = Array.from({ length: 7 }, (_, index) => {
@@ -107,7 +108,9 @@ function getWeeklyMetrics(
     days,
     weeklyAverage,
     weeklyTarget: CALORIE_GOAL,
-    isWeeklyTargetMet: weeklyAverage <= CALORIE_GOAL,
+    isWeeklyTargetMet:
+      elapsedDays * CALORIE_GOAL * 0.8 <= weeklyTotal &&
+      weeklyTotal <= elapsedDays * CALORIE_GOAL * 1.2,
   };
 }
 
@@ -182,7 +185,10 @@ function MobileCalendarControls() {
 
   const goToToday = () => {
     const today = new Date();
-    setViewMonth(today.getMonth() as CalendarState["month"], today.getFullYear());
+    setViewMonth(
+      today.getMonth() as CalendarState["month"],
+      today.getFullYear(),
+    );
   };
 
   return (
@@ -230,13 +236,13 @@ function MobileCalendarDayTrigger({
         "size-full rounded-xl border p-1.5 text-left transition-colors",
         isToday
           ? "border-primary/60 bg-primary/10"
-          : "border-border bg-card/30 hover:border-primary/40"
+          : "border-border bg-card/30 hover:border-primary/40",
       )}
     >
       <span
         className={cn(
           "text-sm font-medium",
-          isToday ? "text-primary" : "text-muted-foreground"
+          isToday ? "text-primary" : "text-muted-foreground",
         )}
       >
         {day}
@@ -301,12 +307,23 @@ function LandingCalendar({
 
   const featureByDate = useMemo(
     () =>
-      new Map(features.map((feature) => [format(feature.date, "yyyy-MM-dd"), feature])),
-    [features]
+      new Map(
+        features.map((feature) => [
+          format(feature.date, "yyyy-MM-dd"),
+          feature,
+        ]),
+      ),
+    [features],
   );
 
-  const weeklyMetrics = useMemo(() => getWeeklyMetrics(weeklySummaries), [weeklySummaries]);
-  const recentMealsForWidget = useMemo(() => recentMeals.slice(0, 3), [recentMeals]);
+  const weeklyMetrics = useMemo(
+    () => getWeeklyMetrics(weeklySummaries),
+    [weeklySummaries],
+  );
+  const recentMealsForWidget = useMemo(
+    () => recentMeals.slice(0, 3),
+    [recentMeals],
+  );
 
   const todayDate = new Date();
   const todayDateKey = format(todayDate, "yyyy-MM-dd");
@@ -461,7 +478,7 @@ function LandingCalendar({
                       "size-full p-1.5 sm:p-2 rounded-xl border transition-all text-left flex flex-col",
                       isToday
                         ? "border-emerald-500/50 dark:border-emerald-400/50 bg-emerald-500/10 dark:bg-emerald-400/10"
-                        : "border-border hover:border-primary/50 bg-card/10"
+                        : "border-border hover:border-primary/50 bg-card/10",
                     )}
                   >
                     <span
@@ -469,7 +486,7 @@ function LandingCalendar({
                         "text-xs sm:text-sm font-medium",
                         isToday
                           ? "text-emerald-600 dark:text-emerald-400"
-                          : "text-muted-foreground"
+                          : "text-muted-foreground",
                       )}
                     >
                       {day}
