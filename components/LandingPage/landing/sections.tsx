@@ -79,11 +79,7 @@ function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
             >
               <ChevronLeft className="size-3" />
             </Button>
-            <Button
-              aria-label="Next month"
-              size="icon-xs"
-              variant="outline"
-            >
+            <Button aria-label="Next month" size="icon-xs" variant="outline">
               <ChevronRight className="size-3" />
             </Button>
           </div>
@@ -293,20 +289,19 @@ export function HeroSection({
 }: HeroSectionProps) {
   return (
     <section className="relative overflow-hidden border-b border-border/60 pb-20 pt-32 sm:pb-28 sm:pt-40">
+      {/* Dot pattern background */}
+      <div className="pointer-events-none absolute inset-0 bg-dot-pattern mask-[radial-gradient(ellipse_90%_80%_at_50%_30%,black_40%,transparent)]" />
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="landing-v2-glow absolute left-1/4 top-20 size-96 rounded-full bg-amber-500/10 blur-3xl" />
+        <div className="landing-v2-glow absolute -left-20 top-10 size-[500px] rounded-full bg-amber-500/20 blur-[100px]" />
         <div
-          className="landing-v2-glow absolute bottom-0 right-1/4 size-80 rounded-full bg-violet-500/10 blur-3xl"
+          className="landing-v2-glow absolute -bottom-20 right-0 size-[400px] rounded-full bg-violet-500/15 blur-[100px]"
           style={{ animationDelay: "1.6s" }}
         />
       </div>
       <div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6">
         <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16">
           <div className="flex-1 text-center lg:text-left">
-            <Badge
-              className="px-3 py-1"
-              variant="brand-outline"
-            >
+            <Badge className="px-3 py-1" variant="brand-outline">
               <Sparkles className="size-3.5" />
               {badgeText}
             </Badge>
@@ -372,7 +367,9 @@ export function HeroSection({
 
 export function StatsSection({ items }: { items: StatItem[] }) {
   return (
-    <section className="border-y border-border/60 bg-muted/35">
+    <section className="relative border-y border-border/60 bg-muted/35">
+      {/* Crosshatch pattern */}
+      <div className="pointer-events-none absolute inset-0 bg-crosshatch-pattern [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_80%,transparent)]" />
       <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
         <div className="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
           {items.map((item) => (
@@ -406,8 +403,13 @@ export function FeaturesSection({
   items,
 }: FeaturesSectionProps) {
   return (
-    <section className="py-20 sm:py-28" id="features">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+    <section className="relative overflow-hidden py-20 sm:py-28" id="features">
+      {/* Grid pattern */}
+      <div className="pointer-events-none absolute inset-0 bg-grid-pattern [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]" />
+      {/* Accent glow */}
+      <div className="pointer-events-none absolute -right-32 top-1/4 size-[400px] rounded-full bg-amber-400/15 blur-[120px]" />
+      <div className="pointer-events-none absolute -left-32 bottom-1/4 size-[300px] rounded-full bg-violet-400/10 blur-[100px]" />
+      <div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6">
         <SectionHeader description={description} title={title} />
         <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((feature) => (
@@ -444,10 +446,14 @@ export function DemoSection({
 }: DemoSectionProps) {
   return (
     <section
-      className="border-y border-border/60 bg-muted/35 py-20 sm:py-28"
+      className="relative overflow-hidden border-y border-border/60 bg-muted/35 py-20 sm:py-28"
       id="demo"
     >
-      <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-12 px-4 sm:px-6 lg:flex-row lg:gap-16">
+      {/* Crosshatch pattern */}
+      <div className="pointer-events-none absolute inset-0 bg-crosshatch-pattern [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]" />
+      {/* Accent glow */}
+      <div className="pointer-events-none absolute left-1/4 top-0 size-[350px] rounded-full bg-amber-500/15 blur-[100px]" />
+      <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center gap-12 px-4 sm:px-6 lg:flex-row lg:gap-16">
         <div className="order-2 flex w-full flex-1 justify-center lg:order-1">
           <TypingDemoCard
             className="landing-v2-float-delay"
@@ -504,8 +510,13 @@ export function NutritionSection({
   );
 
   return (
-    <section className="py-20 sm:py-28" id="nutrition">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+    <section className="relative overflow-hidden py-20 sm:py-28" id="nutrition">
+      {/* Dot pattern */}
+      <div className="pointer-events-none absolute inset-0 bg-dot-pattern [mask-image:radial-gradient(ellipse_90%_70%_at_50%_50%,black_30%,transparent)]" />
+      {/* Accent glow */}
+      <div className="pointer-events-none absolute -right-20 top-1/3 size-[450px] rounded-full bg-orange-400/12 blur-[120px]" />
+      <div className="pointer-events-none absolute -left-20 bottom-1/3 size-[350px] rounded-full bg-amber-500/10 blur-[100px]" />
+      <div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6">
         <SectionHeader description={description} title={title} />
 
         <div className="mx-auto mt-16 grid max-w-4xl gap-6 md:grid-cols-2">
@@ -575,8 +586,12 @@ export function HowItWorksSection({
   steps: HowItWorksStep[];
 }) {
   return (
-    <section className="border-y border-border/60 bg-muted/35 py-20 sm:py-28">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+    <section className="relative overflow-hidden border-y border-border/60 bg-muted/35 py-20 sm:py-28">
+      {/* Grid pattern */}
+      <div className="pointer-events-none absolute inset-0 bg-grid-pattern [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]" />
+      {/* Accent glow */}
+      <div className="pointer-events-none absolute left-1/2 top-0 size-[400px] -translate-x-1/2 rounded-full bg-amber-500/15 blur-[120px]" />
+      <div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6">
         <SectionHeader title={title} />
         <div className="mx-auto mt-16 grid max-w-4xl gap-8 md:grid-cols-3">
           {steps.map((step) => (
@@ -596,8 +611,12 @@ export function FaqSection({
   items: FaqItem[];
 }) {
   return (
-    <section className="py-20 sm:py-28" id="faq">
-      <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
+    <section className="relative overflow-hidden py-20 sm:py-28" id="faq">
+      {/* Crosshatch pattern */}
+      <div className="pointer-events-none absolute inset-0 bg-crosshatch-pattern [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]" />
+      {/* Accent glow */}
+      <div className="pointer-events-none absolute -left-10 top-1/2 size-[350px] -translate-y-1/2 rounded-full bg-violet-400/10 blur-[100px]" />
+      <div className="relative mx-auto w-full max-w-3xl px-4 sm:px-6">
         <SectionHeader title={title} />
 
         <Card variant="glass" className="mt-12">
@@ -605,12 +624,8 @@ export function FaqSection({
             <Accordion defaultValue={["faq-0"]}>
               {items.map((item, index) => (
                 <AccordionItem key={item.question} value={`faq-${index}`}>
-                  <AccordionTrigger>
-                    {item.question}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    {item.answer}
-                  </AccordionContent>
+                  <AccordionTrigger>{item.question}</AccordionTrigger>
+                  <AccordionContent>{item.answer}</AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
@@ -629,8 +644,13 @@ export function CtaSection({
   description: string;
 }) {
   return (
-    <section className="border-t border-border/60 bg-muted/35 py-20 sm:py-28">
-      <div className="mx-auto w-full max-w-2xl px-4 text-center sm:px-6">
+    <section className="relative overflow-hidden border-t border-border/60 bg-muted/35 py-20 sm:py-28">
+      {/* Dot pattern */}
+      <div className="pointer-events-none absolute inset-0 bg-dot-pattern [mask-image:radial-gradient(ellipse_90%_70%_at_50%_40%,black_40%,transparent)]" />
+      {/* Accent glows */}
+      <div className="pointer-events-none absolute -left-20 top-1/4 size-[400px] rounded-full bg-amber-500/20 blur-[120px]" />
+      <div className="pointer-events-none absolute -right-20 bottom-1/4 size-[350px] rounded-full bg-orange-400/15 blur-[100px]" />
+      <div className="relative mx-auto w-full max-w-2xl px-4 text-center sm:px-6">
         <span className="mb-6 inline-flex rounded-2xl bg-amber-500/10 p-3 text-amber-600 dark:text-amber-300">
           <Leaf className="size-8" />
         </span>

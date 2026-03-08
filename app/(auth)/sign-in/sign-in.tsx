@@ -23,11 +23,14 @@ import { ThemeToggle } from "@/ui/components/theme-toggle";
 export default function SignInPage() {
   return (
     <div className="landing-v2 relative min-h-screen overflow-hidden bg-background text-foreground">
+      {/* Background Pattern */}
+      <div className="pointer-events-none absolute inset-0 bg-grid-pattern mask-[radial-gradient(ellipse_at_center,black_40%,transparent_80%)]" />
+
       <div className="absolute right-4 top-4 z-50">
         <ThemeToggle />
       </div>
-      <div className="pointer-events-none absolute -top-28 left-1/4 h-72 w-72 rounded-full bg-amber-500/15 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-20 right-1/4 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-28 left-1/4 size-[500px] rounded-full bg-amber-500/25 blur-[120px]" />
+      <div className="pointer-events-none absolute -bottom-20 right-1/4 size-[400px] rounded-full bg-violet-400/15 blur-[100px]" />
 
       <div className="mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center gap-8 px-4 py-10">
         <section className="flex flex-col items-center space-y-7 text-center">
