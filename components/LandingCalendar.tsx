@@ -22,22 +22,16 @@ import {
   addDays,
   differenceInCalendarDays,
   format,
-  isSameDay,
-  isYesterday,
   startOfWeek,
   parseISO,
 } from "date-fns";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { cn } from "@/ui/lib/utils";
 import { Button } from "@/ui/components/base/button";
 import {
   DailySummaryCard,
 } from "@/components/dashboard/DailySummaryCard";
-import {
-  MobileDashboardView,
-  ViewModeToggle,
-} from "@/components/dashboard/ViewModeToggle";
-import { TimelineDayCard } from "@/components/dashboard/TimelineDayCard";
+
 import {
   GoalsWidget,
   RecentMealsWidget,
@@ -263,7 +257,6 @@ function LandingCalendar({
   weeklySummaries,
   recentMeals,
 }: LandingCalendarProps) {
-  const [mobileView, setMobileView] = useState<MobileDashboardView>("timeline");
   const pendingUrlSyncRef = useRef<CalendarState | null>(null);
   const calendarMonth = useCalendarMonth();
   const calendarYear = useCalendarYear();
@@ -322,18 +315,6 @@ function LandingCalendar({
     ? getFeatureSnapshot(todayFeature)
     : { calories: 0, protein: 0, carbs: 0, fat: 0 };
 
-  const timelineDateKeys = useMemo(
-    () =>
-      features
-        .map((feature) => format(feature.date, "yyyy-MM-dd"))
-        .sort((a, b) => b.localeCompare(a)),
-    [features]
-  );
-
-  const pastTimelineDateKeys = timelineDateKeys.filter(
-    (dateKey) => dateKey !== todayDateKey
-  );
-
   return (
     <>
       <section className="md:hidden space-y-3">
@@ -348,157 +329,99 @@ function LandingCalendar({
           fat={todaySummary.fat}
           goalFat={MACRO_GOALS.fat}
           compact
+          action={
+            <AddFoodDialog
+              date={todayDateKey}
+              hideTrigger
+              trigger={
+                <>
+                  <Plus className="size-4" />
+                  <span>Log Food</span>
+                </>
+              }
+              triggerClassName="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+            />
+          }
         />
 
-        <ViewModeToggle value={mobileView} onChange={setMobileView} />
+        <div className="space-y-3">
+          <CalendarProvider className="w-full gap-2">
+            <div className="rounded-xl border border-border bg-card/60">
+              <MobileCalendarControls />
 
-        {mobileView === "timeline" ? (
-          <div className="space-y-3">
-            <DailySummaryCard
-              title="Today"
-              subtitle={format(todayDate, "EEEE, MMM d")}
-              calories={todaySummary.calories}
-              goalCalories={CALORIE_GOAL}
-              protein={todaySummary.protein}
-              goalProtein={MACRO_GOALS.protein}
-              carbs={todaySummary.carbs}
-              goalCarbs={MACRO_GOALS.carbs}
-              fat={todaySummary.fat}
-              goalFat={MACRO_GOALS.fat}
-              compact
-              action={
-                <AddFoodDialog
-                  date={todayDateKey}
-                  hideTrigger
-                  trigger={
-                    <>
-                      <Plus className="size-4" />
-                      <span>Log Food</span>
-                    </>
-                  }
-                  triggerClassName="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-                />
-              }
-            />
-
-            {pastTimelineDateKeys.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-                No earlier summaries for this month yet.
+              <div className="grid grid-cols-7 px-3 pb-1 text-center text-xs font-medium text-muted-foreground">
+                {["S", "M", "T", "W", "T", "F", "S"].map((label, index) => (
+                  <span key={`${label}-${index}`}>{label}</span>
+                ))}
               </div>
-            ) : (
-              pastTimelineDateKeys.map((dateKey) => {
-                const feature = featureByDate.get(dateKey);
-                if (!feature) {
-                  return null;
-                }
-                const snapshot = getFeatureSnapshot(feature);
-                const parsedDate = parseISO(dateKey);
-                const label = isYesterday(parsedDate)
-                  ? "Yesterday"
-                  : format(parsedDate, "EEE, MMM d");
 
-                return (
-                  <FoodLogDialogWrapper
-                    key={dateKey}
-                    foodLog={feature}
-                    date={parsedDate}
-                    isToday={isSameDay(parsedDate, todayDate)}
-                    trigger={
-                      <TimelineDayCard
-                        label={label}
-                        calories={snapshot.calories}
-                        protein={snapshot.protein}
-                        carbs={snapshot.carbs}
-                        fat={snapshot.fat}
-                        calorieGoal={CALORIE_GOAL}
-                      />
-                    }
-                    triggerClassName="w-full text-left"
-                  />
-                );
-              })
-            )}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <CalendarProvider className="w-full gap-2">
-              <div className="rounded-xl border border-border bg-card/60">
-                <MobileCalendarControls />
+              <CalendarBody
+                features={features}
+                className="border-none px-3 pb-3 auto-rows-[minmax(3.25rem,1fr)]"
+                renderDay={({ day, date, features: dayFeatures, isToday }) => {
+                  const dateStr = format(date, "yyyy-MM-dd");
+                  const feature = dayFeatures[0];
+                  const trigger = (
+                    <MobileCalendarDayTrigger
+                      day={day}
+                      isToday={isToday}
+                      feature={feature}
+                    />
+                  );
 
-                <div className="grid grid-cols-7 px-3 pb-1 text-center text-xs font-medium text-muted-foreground">
-                  {["S", "M", "T", "W", "T", "F", "S"].map((label, index) => (
-                    <span key={`${label}-${index}`}>{label}</span>
-                  ))}
-                </div>
-
-                <CalendarBody
-                  features={features}
-                  className="border-none px-3 pb-3 auto-rows-[minmax(3.25rem,1fr)]"
-                  renderDay={({ day, date, features: dayFeatures, isToday }) => {
-                    const dateStr = format(date, "yyyy-MM-dd");
-                    const feature = dayFeatures[0];
-                    const trigger = (
-                      <MobileCalendarDayTrigger
-                        day={day}
-                        isToday={isToday}
-                        feature={feature}
-                      />
-                    );
-
-                    if (feature) {
-                      return (
-                        <FoodLogDialogWrapper
-                          key={dateStr}
-                          foodLog={feature}
-                          date={date}
-                          isToday={isToday}
-                          trigger={trigger}
-                          triggerClassName="size-full"
-                        />
-                      );
-                    }
-
+                  if (feature) {
                     return (
-                      <AddFoodDialog
+                      <FoodLogDialogWrapper
                         key={dateStr}
-                        date={dateStr}
-                        hideTrigger
+                        foodLog={feature}
+                        date={date}
+                        isToday={isToday}
                         trigger={trigger}
                         triggerClassName="size-full"
                       />
                     );
-                  }}
-                >
-                  {() => null}
-                </CalendarBody>
+                  }
 
-                <div className="flex items-center justify-center gap-6 px-3 pb-3 pt-1 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-1 w-3 rounded-full bg-emerald-500 dark:bg-emerald-400" />
-                    Protein
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-1 w-3 rounded-full bg-amber-500 dark:bg-amber-400" />
-                    Carbs
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-1 w-3 rounded-full bg-rose-500 dark:bg-rose-400" />
-                    Fat
-                  </span>
-                </div>
+                  return (
+                    <AddFoodDialog
+                      key={dateStr}
+                      date={dateStr}
+                      hideTrigger
+                      trigger={trigger}
+                      triggerClassName="size-full"
+                    />
+                  );
+                }}
+              >
+                {() => null}
+              </CalendarBody>
+
+              <div className="flex items-center justify-center gap-6 px-3 pb-3 pt-1 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <span className="h-1 w-3 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+                  Protein
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-1 w-3 rounded-full bg-amber-500 dark:bg-amber-400" />
+                  Carbs
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-1 w-3 rounded-full bg-rose-500 dark:bg-rose-400" />
+                  Fat
+                </span>
               </div>
-            </CalendarProvider>
+            </div>
+          </CalendarProvider>
 
-            <WeeklyWidget
-              days={weeklyMetrics.days}
-              weeklyAverage={weeklyMetrics.weeklyAverage}
-              weeklyTarget={weeklyMetrics.weeklyTarget}
-              isWeeklyTargetMet={weeklyMetrics.isWeeklyTargetMet}
-            />
-            <GoalsWidget />
-            <RecentMealsWidget recentMeals={recentMealsForWidget} />
-          </div>
-        )}
+          <WeeklyWidget
+            days={weeklyMetrics.days}
+            weeklyAverage={weeklyMetrics.weeklyAverage}
+            weeklyTarget={weeklyMetrics.weeklyTarget}
+            isWeeklyTargetMet={weeklyMetrics.isWeeklyTargetMet}
+          />
+          <GoalsWidget />
+          <RecentMealsWidget recentMeals={recentMealsForWidget} />
+        </div>
       </section>
 
       <div className="hidden md:flex h-full">
