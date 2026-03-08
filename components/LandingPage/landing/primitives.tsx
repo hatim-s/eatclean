@@ -81,9 +81,13 @@ export function SectionHeader({
 }: SectionHeaderProps) {
   return (
     <div className={cn("mx-auto max-w-2xl text-center", className)}>
-      <h2 className="text-3xl font-semibold text-zinc-50 sm:text-4xl">{title}</h2>
+      <h2 className="text-3xl font-semibold text-zinc-50 sm:text-4xl">
+        {title}
+      </h2>
       {description ? (
-        <p className={cn("mt-4 text-zinc-400", descriptionClassName)}>{description}</p>
+        <p className={cn("mt-4 text-zinc-400", descriptionClassName)}>
+          {description}
+        </p>
       ) : null}
     </div>
   );
@@ -98,7 +102,7 @@ export function FeatureCard({ feature }: { feature: FeatureItem }) {
         <span
           className={cn(
             "inline-flex size-10 items-center justify-center rounded-xl border",
-            featureToneClasses[feature.tone]
+            featureToneClasses[feature.tone],
           )}
         >
           <Icon className="size-5" />
@@ -119,7 +123,9 @@ export function StepCard({ step }: { step: HowItWorksStep }) {
         {step.step}
       </div>
       <h3 className="mb-2 text-lg font-semibold text-zinc-100">{step.title}</h3>
-      <p className="text-sm leading-relaxed text-zinc-400">{step.description}</p>
+      <p className="text-sm leading-relaxed text-zinc-400">
+        {step.description}
+      </p>
     </div>
   );
 }
@@ -137,7 +143,9 @@ export function AnimatedCounter({
 
   useEffect(() => {
     if (prefersReducedMotion) {
-      const reducedFrameId = window.requestAnimationFrame(() => setCount(value));
+      const reducedFrameId = window.requestAnimationFrame(() =>
+        setCount(value),
+      );
 
       return () => window.cancelAnimationFrame(reducedFrameId);
     }
@@ -172,7 +180,7 @@ export function AnimatedCounter({
         frameId = window.requestAnimationFrame(tick);
         observer.disconnect();
       },
-      { threshold: 0.45 }
+      { threshold: 0.45 },
     );
 
     observer.observe(element);
@@ -226,5 +234,12 @@ export function NutrientProgressRow({
 }
 
 export function ToneDot({ tone }: { tone: NutrientTone }) {
-  return <span className={cn("inline-block size-2 rounded-full", nutrientDotToneClasses[tone])} />;
+  return (
+    <span
+      className={cn(
+        "inline-block size-2 rounded-full",
+        nutrientDotToneClasses[tone],
+      )}
+    />
+  );
 }

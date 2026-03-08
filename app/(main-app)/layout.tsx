@@ -1,8 +1,8 @@
 import { getSession } from "@/auth/session";
 import { redirect } from "next/navigation";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, Suspense } from "react";
 
-export default async function MainAppLayout({ children }: PropsWithChildren) {
+async function AuthenticatedLayout({ children }: PropsWithChildren) {
   const session = await getSession();
 
   if (!session) {
@@ -10,4 +10,12 @@ export default async function MainAppLayout({ children }: PropsWithChildren) {
   }
 
   return children;
+}
+
+export default function MainAppLayout({ children }: PropsWithChildren) {
+  return (
+    <Suspense fallback={null}>
+      <AuthenticatedLayout>{children}</AuthenticatedLayout>
+    </Suspense>
+  );
 }

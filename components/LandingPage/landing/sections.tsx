@@ -67,7 +67,9 @@ function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
     <Card className="w-full max-w-sm border-zinc-800 bg-zinc-900/95 py-5 shadow-2xl">
       <CardHeader className="space-y-4 pb-0">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm font-semibold text-zinc-100">{data.monthLabel}</CardTitle>
+          <CardTitle className="text-sm font-semibold text-zinc-100">
+            {data.monthLabel}
+          </CardTitle>
           <div className="flex gap-1">
             <Button
               aria-label="Previous month"
@@ -91,7 +93,10 @@ function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
       <CardContent className="space-y-2 px-5">
         <div className="grid grid-cols-7 gap-1">
           {data.weekdays.map((day) => (
-            <span className="py-1 text-center text-[10px] font-medium text-zinc-500" key={day}>
+            <span
+              className="py-1 text-center text-[10px] font-medium text-zinc-500"
+              key={day}
+            >
               {day}
             </span>
           ))}
@@ -104,7 +109,9 @@ function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
             }
 
             const calories = data.filledCalories[day];
-            const dayProgress = calories ? Math.min((calories / data.goalCalories) * 100, 100) : 0;
+            const dayProgress = calories
+              ? Math.min((calories / data.goalCalories) * 100, 100)
+              : 0;
             const isCurrentDay = day === data.highlightedDay;
 
             return (
@@ -115,7 +122,7 @@ function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
                     ? "bg-amber-500/10 ring-1 ring-amber-500"
                     : calories
                       ? "bg-zinc-800/70 hover:bg-zinc-800"
-                      : "bg-zinc-800/20"
+                      : "bg-zinc-800/20",
                 )}
                 key={`day-${day}`}
               >
@@ -126,7 +133,7 @@ function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
                       ? "text-amber-300"
                       : calories
                         ? "text-zinc-300"
-                        : "text-zinc-600"
+                        : "text-zinc-600",
                   )}
                 >
                   {day}
@@ -148,7 +155,10 @@ function MiniCalendarCard({ data }: { data: MiniCalendarData }) {
           {data.legend.map((item) => (
             <span className="inline-flex items-center gap-1" key={item.label}>
               <span
-                className={cn("inline-block h-0.5 w-2 rounded-full", legendToneClassName[item.tone])}
+                className={cn(
+                  "inline-block h-0.5 w-2 rounded-full",
+                  legendToneClassName[item.tone],
+                )}
               />
               {item.label}
             </span>
@@ -186,7 +196,11 @@ export function LandingNavigation({
 
         <nav className="hidden items-center gap-8 text-sm text-zinc-400 md:flex">
           {items.map((item) => (
-            <a className="transition-colors hover:text-zinc-100" href={item.href} key={item.href}>
+            <a
+              className="transition-colors hover:text-zinc-100"
+              href={item.href}
+              key={item.href}
+            >
               {item.label}
             </a>
           ))}
@@ -205,13 +219,21 @@ export function LandingNavigation({
             Sign in with GitHub
           </Link>
           <Button
-            aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-label={
+              isMobileMenuOpen
+                ? "Close navigation menu"
+                : "Open navigation menu"
+            }
             className="text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 md:hidden"
             onClick={onToggleMobileMenu}
             size="icon-sm"
             variant="ghost"
           >
-            {isMobileMenuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
+            {isMobileMenuOpen ? (
+              <X className="size-4" />
+            ) : (
+              <Menu className="size-4" />
+            )}
           </Button>
         </div>
       </div>
@@ -328,7 +350,10 @@ export function HeroSection({
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-zinc-500 lg:justify-start">
               {trustItems.map((item) => (
-                <span className="inline-flex items-center gap-1.5" key={item.label}>
+                <span
+                  className="inline-flex items-center gap-1.5"
+                  key={item.label}
+                >
                   <Check className="size-3.5 text-amber-400" />
                   {item.label}
                 </span>
@@ -375,7 +400,11 @@ type FeaturesSectionProps = {
   items: FeatureItem[];
 };
 
-export function FeaturesSection({ title, description, items }: FeaturesSectionProps) {
+export function FeaturesSection({
+  title,
+  description,
+  items,
+}: FeaturesSectionProps) {
   return (
     <section className="py-20 sm:py-28" id="features">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
@@ -414,7 +443,10 @@ export function DemoSection({
   parsedItems,
 }: DemoSectionProps) {
   return (
-    <section className="border-y border-zinc-800/60 bg-zinc-900/35 py-20 sm:py-28" id="demo">
+    <section
+      className="border-y border-zinc-800/60 bg-zinc-900/35 py-20 sm:py-28"
+      id="demo"
+    >
       <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-12 px-4 sm:px-6 lg:flex-row lg:gap-16">
         <div className="order-2 flex w-full flex-1 justify-center lg:order-1">
           <TypingDemoCard
@@ -426,7 +458,9 @@ export function DemoSection({
         </div>
 
         <div className="order-1 flex-1 text-center lg:order-2 lg:text-left">
-          <h2 className="text-3xl font-semibold text-zinc-50 sm:text-4xl">{title}</h2>
+          <h2 className="text-3xl font-semibold text-zinc-50 sm:text-4xl">
+            {title}
+          </h2>
           <p className="mt-6 leading-relaxed text-zinc-400">{description}</p>
 
           <div className="mt-8 space-y-4 text-left">
@@ -460,9 +494,12 @@ export function NutritionSection({
 }: NutritionSectionProps) {
   const dailyProgress = Math.min(
     Math.round((dailySummary.consumed / dailySummary.goal) * 100),
-    100
+    100,
   );
-  const remainingCalories = Math.max(dailySummary.goal - dailySummary.consumed, 0);
+  const remainingCalories = Math.max(
+    dailySummary.goal - dailySummary.consumed,
+    0,
+  );
 
   return (
     <section className="py-20 sm:py-28" id="nutrition">
@@ -502,8 +539,12 @@ export function NutritionSection({
             </CardHeader>
             <CardContent>
               <div className="py-4 text-center">
-                <div className="text-4xl font-semibold text-zinc-50">{dailySummary.consumed.toLocaleString()}</div>
-                <p className="mb-4 mt-1 text-sm text-zinc-500">of {dailySummary.goal.toLocaleString()} kcal goal</p>
+                <div className="text-4xl font-semibold text-zinc-50">
+                  {dailySummary.consumed.toLocaleString()}
+                </div>
+                <p className="mb-4 mt-1 text-sm text-zinc-500">
+                  of {dailySummary.goal.toLocaleString()} kcal goal
+                </p>
                 <Progress
                   className="gap-0 [&>[data-slot=progress-track]:last-child]:hidden"
                   value={dailyProgress}
@@ -512,7 +553,9 @@ export function NutritionSection({
                     <ProgressIndicator className="bg-gradient-to-r from-orange-500 to-amber-400" />
                   </ProgressTrack>
                 </Progress>
-                <p className="mt-2 text-xs text-zinc-500">{remainingCalories.toLocaleString()} kcal remaining</p>
+                <p className="mt-2 text-xs text-zinc-500">
+                  {remainingCalories.toLocaleString()} kcal remaining
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -543,7 +586,13 @@ export function HowItWorksSection({
   );
 }
 
-export function FaqSection({ title, items }: { title: string; items: FaqItem[] }) {
+export function FaqSection({
+  title,
+  items,
+}: {
+  title: string;
+  items: FaqItem[];
+}) {
   return (
     <section className="py-20 sm:py-28" id="faq">
       <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
@@ -557,7 +606,9 @@ export function FaqSection({ title, items }: { title: string; items: FaqItem[] }
                   <AccordionTrigger className="text-zinc-200 hover:no-underline data-[open]:text-zinc-100">
                     {item.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-zinc-400">{item.answer}</AccordionContent>
+                  <AccordionContent className="text-zinc-400">
+                    {item.answer}
+                  </AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
@@ -568,14 +619,22 @@ export function FaqSection({ title, items }: { title: string; items: FaqItem[] }
   );
 }
 
-export function CtaSection({ title, description }: { title: string; description: string }) {
+export function CtaSection({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
   return (
     <section className="border-t border-zinc-800/60 bg-zinc-900/35 py-20 sm:py-28">
       <div className="mx-auto w-full max-w-2xl px-4 text-center sm:px-6">
         <span className="mb-6 inline-flex rounded-2xl bg-amber-500/10 p-3 text-amber-300">
           <Leaf className="size-8" />
         </span>
-        <h2 className="text-3xl font-semibold text-zinc-50 sm:text-4xl">{title}</h2>
+        <h2 className="text-3xl font-semibold text-zinc-50 sm:text-4xl">
+          {title}
+        </h2>
         <p className="mx-auto mt-4 max-w-md text-zinc-400">{description}</p>
 
         <Link
@@ -604,7 +663,9 @@ export function LandingFooter({ note }: { note: string }) {
           </span>
           <span className="text-sm font-semibold text-zinc-400">EatClean</span>
         </div>
-        <p className="text-center text-xs text-zinc-600 sm:text-right">{note}</p>
+        <p className="text-center text-xs text-zinc-600 sm:text-right">
+          {note}
+        </p>
       </div>
     </footer>
   );

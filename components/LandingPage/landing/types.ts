@@ -25,7 +25,13 @@ export type StatItem = {
   suffix?: string;
 };
 
-export type NutrientTone = "emerald" | "amber" | "rose" | "violet" | "cyan" | "orange";
+export type NutrientTone =
+  | "emerald"
+  | "amber"
+  | "rose"
+  | "violet"
+  | "cyan"
+  | "orange";
 
 export type NutrientItem = {
   label: string;

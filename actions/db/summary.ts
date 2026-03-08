@@ -1,18 +1,18 @@
 "use server";
 
 import { db, dailySummary, foodLog } from "@/db";
-import { getSession } from "@/auth/session";
-import { eq, and, gte, lte, asc } from "drizzle-orm";
+import { requireUserId } from "@/auth/session";
+import { eq, and } from "drizzle-orm";
 import { DailySummary, FoodItem } from "@/types/db";
 import { sumNutritionFromLogItems } from "../lib/sumNutritionFromLogItems";
 import {
-  startOfWeek,
-  endOfWeek,
-  startOfMonth,
-  endOfMonth,
-  format,
-  parseISO,
-} from "date-fns";
+  getCachedDailySummary,
+  getCachedMonthlySummary,
+  getCachedWeeklySummary,
+} from "@/data/dashboard";
+import { getSummaryInvalidationTags } from "@/data/cache-tags";
+import { updateTag } from "next/cache";
+import { format } from "date-fns";
 
 type FoodLogItemWithQuantity = Omit<FoodItem, "embedding" | "dataSource"> & {
   quantity_gms: number;
@@ -21,91 +21,39 @@ type FoodLogItemWithQuantity = Omit<FoodItem, "embedding" | "dataSource"> & {
 export async function getDailySummary(
   date: string
 ): Promise<DailySummary | null> {
-  const session = await getSession();
-  if (!session?.user) {
-    throw new Error("Unauthorized");
-  }
-
-  const [summary] = await db
-    .select()
-    .from(dailySummary)
-    .where(
-      and(eq(dailySummary.userId, session.user.id), eq(dailySummary.date, date))
-    )
-    .limit(1);
-
-  return summary || null;
+  const userId = await requireUserId();
+  return getCachedDailySummary(userId, date);
 }
 
 export async function getWeeklySummary(
   weekStartDate: string | Date
 ): Promise<DailySummary[]> {
-  const session = await getSession();
-  if (!session?.user) {
-    throw new Error("Unauthorized");
-  }
+  const userId = await requireUserId();
+  const date =
+    typeof weekStartDate === "string"
+      ? weekStartDate
+      : format(weekStartDate, "yyyy-MM-dd");
 
-  const startDate =
-    typeof weekStartDate === "string" ? parseISO(weekStartDate) : weekStartDate;
-  const weekStart = format(
-    startOfWeek(startDate, { weekStartsOn: 1 }),
-    "yyyy-MM-dd"
-  );
-  const weekEnd = format(
-    endOfWeek(startDate, { weekStartsOn: 1 }),
-    "yyyy-MM-dd"
-  );
-
-  return await db
-    .select()
-    .from(dailySummary)
-    .where(
-      and(
-        eq(dailySummary.userId, session.user.id),
-        gte(dailySummary.date, weekStart),
-        lte(dailySummary.date, weekEnd)
-      )
-    )
-    .orderBy(asc(dailySummary.date));
+  return getCachedWeeklySummary(userId, date);
 }
 
 export async function getMonthlySummary(
   monthDate: string | Date
 ): Promise<DailySummary[]> {
-  const session = await getSession();
-  if (!session?.user) {
-    throw new Error("Unauthorized");
-  }
+  const userId = await requireUserId();
+  const date =
+    typeof monthDate === "string" ? monthDate : format(monthDate, "yyyy-MM-dd");
 
-  const date = typeof monthDate === "string" ? parseISO(monthDate) : monthDate;
-  const monthStart = format(startOfMonth(date), "yyyy-MM-dd");
-  const monthEnd = format(endOfMonth(date), "yyyy-MM-dd");
-
-  return await db
-    .select()
-    .from(dailySummary)
-    .where(
-      and(
-        eq(dailySummary.userId, session.user.id),
-        gte(dailySummary.date, monthStart),
-        lte(dailySummary.date, monthEnd)
-      )
-    )
-    .orderBy(asc(dailySummary.date));
+  return getCachedMonthlySummary(userId, date);
 }
 
 export async function getSummaryById(id: string): Promise<DailySummary | null> {
-  const session = await getSession();
-  if (!session?.user) {
-    throw new Error("Unauthorized");
-  }
+  const userId = await requireUserId();
 
   const [summary] = await db
     .select()
     .from(dailySummary)
-    .where(
-      and(eq(dailySummary.id, id), eq(dailySummary.userId, session.user.id))
-    )
+    .where(and(eq(dailySummary.id, id), eq(dailySummary.userId, userId)))
     .limit(1);
 
   return summary || null;
@@ -114,13 +62,8 @@ export async function getSummaryById(id: string): Promise<DailySummary | null> {
 export async function recalculateDailySummary(
   date: string
 ): Promise<DailySummary | null> {
-  const session = await getSession();
-  if (!session?.user) {
-    throw new Error("Unauthorized");
-  }
-
-  const userId = session.user.id;
-  return await db.transaction(async (tx) => {
+  const userId = await requireUserId();
+  const summary = await db.transaction(async (tx) => {
     // Get all logs for this day
     const dayLogs = await tx
       .select()
@@ -186,4 +129,10 @@ export async function recalculateDailySummary(
 
     return summary;
   });
+
+  for (const tag of getSummaryInvalidationTags(userId, date)) {
+    updateTag(tag);
+  }
+
+  return summary;
 }

@@ -1,27 +1,28 @@
 "use server";
 
 import { db, foodLog, dailySummary } from "@/db";
-import { getSession } from "@/auth/session";
-import { eq, and, asc, desc, gte, lte } from "drizzle-orm";
+import { requireUserId } from "@/auth/session";
+import { eq, and, desc, gte, lte } from "drizzle-orm";
 import { NewFoodLog, FoodLog as FoodLogType, FoodItem } from "@/types/db";
 import { sumNutritionFromLogItems } from "../lib/sumNutritionFromLogItems";
 import { endOfMonth, format, parseISO, startOfMonth } from "date-fns";
+import {
+  getCachedFoodLogsByDate,
+  getCachedRecentFoodLogs,
+} from "@/data/dashboard";
+import { getFoodTrackingInvalidationTags } from "@/data/cache-tags";
+import { updateTag } from "next/cache";
 
 type FoodLogItemWithQuantity = Omit<FoodItem, "embedding" | "dataSource"> & {
   quantity_gms: number;
 };
 
 export async function createFoodLogEntry(data: Omit<NewFoodLog, "userId" | "id" | "createdAt">): Promise<FoodLogType> {
-  const session = await getSession();
-  if (!session?.user) {
-    throw new Error("Unauthorized");
-  }
-
-  const userId = session.user.id;
+  const userId = await requireUserId();
   const logDate = data.logDate;
 
   try {
-    return await db.transaction(async (tx) => {
+    const newLog = await db.transaction(async (tx) => {
       // Insert food log
       const [newLog] = await tx
         .insert(foodLog)
@@ -82,6 +83,12 @@ export async function createFoodLogEntry(data: Omit<NewFoodLog, "userId" | "id" 
 
       return newLog;
     });
+
+    for (const tag of getFoodTrackingInvalidationTags(userId, logDate)) {
+      updateTag(tag);
+    }
+
+    return newLog;
   } catch (error) {
     console.error(error);
     throw new Error("Failed to create food log entry", { cause: error });
@@ -89,15 +96,12 @@ export async function createFoodLogEntry(data: Omit<NewFoodLog, "userId" | "id" 
 }
 
 export async function getFoodLogById(id: string): Promise<FoodLogType | null> {
-  const session = await getSession();
-  if (!session?.user) {
-    throw new Error("Unauthorized");
-  }
+  const userId = await requireUserId();
 
   const [log] = await db
     .select()
     .from(foodLog)
-    .where(and(eq(foodLog.id, id), eq(foodLog.userId, session.user.id)))
+    .where(and(eq(foodLog.id, id), eq(foodLog.userId, userId)))
     .limit(1);
 
   return log || null;
@@ -107,41 +111,19 @@ export async function getFoodLogsByDate(
   // date is of the format "2025-01-15"
   date: string
 ): Promise<FoodLogType[]> {
-  const session = await getSession();
-  if (!session?.user) {
-    throw new Error("Unauthorized");
-  }
-
-  return await db
-    .select()
-    .from(foodLog)
-    .where(and(eq(foodLog.userId, session.user.id), eq(foodLog.logDate, date)))
-    .orderBy(asc(foodLog.createdAt));
+  const userId = await requireUserId();
+  return getCachedFoodLogsByDate(userId, date);
 }
 
 export async function getRecentFoodLogs(limit = 5): Promise<FoodLogType[]> {
-  const session = await getSession();
-  if (!session?.user) {
-    throw new Error("Unauthorized");
-  }
-
-  const safeLimit = Math.max(1, Math.min(50, Math.floor(limit)));
-
-  return await db
-    .select()
-    .from(foodLog)
-    .where(eq(foodLog.userId, session.user.id))
-    .orderBy(desc(foodLog.createdAt))
-    .limit(safeLimit);
+  const userId = await requireUserId();
+  return getCachedRecentFoodLogs(userId, limit);
 }
 
 export async function getFoodLogsByMonth(
   monthDate: string | Date
 ): Promise<FoodLogType[]> {
-  const session = await getSession();
-  if (!session?.user) {
-    throw new Error("Unauthorized");
-  }
+  const userId = await requireUserId();
 
   const date = typeof monthDate === "string" ? parseISO(monthDate) : monthDate;
   const monthStart = format(startOfMonth(date), "yyyy-MM-dd");
@@ -152,7 +134,7 @@ export async function getFoodLogsByMonth(
     .from(foodLog)
     .where(
       and(
-        eq(foodLog.userId, session.user.id),
+        eq(foodLog.userId, userId),
         gte(foodLog.logDate, monthStart),
         lte(foodLog.logDate, monthEnd)
       )
@@ -161,12 +143,8 @@ export async function getFoodLogsByMonth(
 }
 
 export async function deleteFoodLog(id: string): Promise<void> {
-  const session = await getSession();
-  if (!session?.user) {
-    throw new Error("Unauthorized");
-  }
-
-  const userId = session.user.id;
+  const userId = await requireUserId();
+  let logDate: string | null = null;
 
   await db.transaction(async (tx) => {
     // Get the log to find its date
@@ -180,7 +158,7 @@ export async function deleteFoodLog(id: string): Promise<void> {
       throw new Error("Food log not found");
     }
 
-    const logDate = log.logDate;
+    logDate = log.logDate;
 
     // Delete the log
     await tx.delete(foodLog).where(eq(foodLog.id, id));
@@ -218,7 +196,7 @@ export async function deleteFoodLog(id: string): Promise<void> {
         .where(
           and(eq(dailySummary.userId, userId), eq(dailySummary.date, logDate))
         )
-        .limit(1);
+          .limit(1);
 
       if (existing) {
         await tx
@@ -242,4 +220,12 @@ export async function deleteFoodLog(id: string): Promise<void> {
       }
     }
   });
+
+  if (!logDate) {
+    return;
+  }
+
+  for (const tag of getFoodTrackingInvalidationTags(userId, logDate)) {
+    updateTag(tag);
+  }
 }

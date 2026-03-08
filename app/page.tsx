@@ -1,8 +1,9 @@
 import { getSession } from "@/auth/session";
 import { redirect } from "next/navigation";
 import { LandingPage } from "@/components/LandingPage";
+import { Suspense } from "react";
 
-export default async function Page() {
+async function SessionAwareLandingPage() {
   const session = await getSession();
 
   if (session?.user) {
@@ -10,4 +11,12 @@ export default async function Page() {
   }
 
   return <LandingPage />;
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<LandingPage />}>
+      <SessionAwareLandingPage />
+    </Suspense>
+  );
 }

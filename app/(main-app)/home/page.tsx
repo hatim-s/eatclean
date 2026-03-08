@@ -4,6 +4,7 @@ import { getRecentFoodLogs } from "@/actions/db/foodLog";
 import { getSession } from "@/auth/session";
 import { Leaf } from "lucide-react";
 import { DashboardHeaderActions } from "@/components/DashboardHeaderActions";
+import { Suspense } from "react";
 import {
   resolveViewMonthDate,
   VIEW_MONTH_QUERY_PARAM,
@@ -30,12 +31,10 @@ function getUserInitials(
 }
 
 type HomePageProps = {
-  searchParams?:
-    | Promise<Record<string, string | string[] | undefined>>
-    | Record<string, string | string[] | undefined>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function Home({ searchParams }: HomePageProps) {
+async function HomeContent({ searchParams }: HomePageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const viewMonthDate = resolveViewMonthDate(
     resolvedSearchParams?.[VIEW_MONTH_QUERY_PARAM]
@@ -81,5 +80,13 @@ export default async function Home({ searchParams }: HomePageProps) {
         />
       </main>
     </div>
+  );
+}
+
+export default function Home(props: HomePageProps) {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent {...props} />
+    </Suspense>
   );
 }
