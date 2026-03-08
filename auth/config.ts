@@ -4,22 +4,26 @@ import { db } from "@/db";
 import * as schema from "@/db";
 
 export const auth = betterAuth({
-    database: drizzleAdapter(db, {
-        provider: "sqlite",
-        schema: {
-            user: schema.user,
-            session: schema.session,
-            account: schema.account,
-            verification: schema.verification,
-        },
-    }),
-    socialProviders: {
-        github: {
-            clientId: process.env.GITHUB_CLIENT_ID!,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-        },
+  database: drizzleAdapter(db, {
+    provider: "sqlite",
+    schema: {
+      user: schema.user,
+      session: schema.session,
+      account: schema.account,
+      verification: schema.verification,
     },
-    emailAndPassword: {
-        enabled: false, // OAuth only for now
+  }),
+  socialProviders: {
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     },
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    },
+  },
+  emailAndPassword: {
+    enabled: false, // OAuth only for now
+  },
 });
