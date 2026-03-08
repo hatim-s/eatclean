@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/ui/components/base/card";
 import { cn } from "@/ui/lib/utils";
+import { clsx } from "clsx";
 
 export type TypingDemoParsedItem = {
   name: string;
@@ -100,11 +101,16 @@ export function TypingDemoCard({
   return (
     <Card
       className={cn(
-        "w-full max-w-sm overflow-hidden border-border bg-card/95 py-0 shadow-2xl",
-        className
+        "w-full max-w-sm overflow-hidden border-border bg-card/95 py-0 shadow-2xl gap-0",
+        className,
       )}
     >
-      <CardHeader className="gap-3 border-b border-border px-4 py-4">
+      <CardHeader
+        className={clsx("gap-3 px-4 py-4", {
+          "border-b border-border":
+            showingProcessing || showingResults || shouldExpand,
+        })}
+      >
         <CardTitle className="flex items-center gap-2 text-xs font-medium text-foreground">
           <span className="inline-flex items-center justify-center rounded-md bg-violet-500/20 p-1.5">
             <Sparkles className="size-3.5 text-violet-600 dark:text-violet-300" />
@@ -119,7 +125,7 @@ export function TypingDemoCard({
               "ml-0.5 inline-block h-4 w-0.5 align-middle",
               phase === "typing" && !prefersReducedMotion
                 ? "animate-pulse bg-amber-400"
-                : "bg-transparent"
+                : "bg-transparent",
             )}
           />
         </CardDescription>
@@ -127,13 +133,15 @@ export function TypingDemoCard({
       <CardContent
         className={cn(
           "overflow-hidden px-4 transition-all duration-500",
-          shouldExpand ? "max-h-72 py-4 opacity-100" : "max-h-0 py-0 opacity-0"
+          shouldExpand ? "max-h-72 py-4 opacity-100" : "max-h-0 py-0 opacity-0",
         )}
       >
         {showingProcessing ? (
           <div className="flex items-center justify-center gap-2 py-4">
             <span className="size-4 animate-spin rounded-full border-2 border-amber-400 border-t-transparent" />
-            <span className="text-xs text-muted-foreground">Analyzing nutrition...</span>
+            <span className="text-xs text-muted-foreground">
+              Analyzing nutrition...
+            </span>
           </div>
         ) : null}
 
@@ -143,7 +151,7 @@ export function TypingDemoCard({
               <div
                 className={cn(
                   "flex items-center justify-between rounded-lg bg-muted/70 px-3 py-2",
-                  !prefersReducedMotion ? "landing-v2-animate-fade-slide" : ""
+                  !prefersReducedMotion ? "landing-v2-animate-fade-slide" : "",
                 )}
                 key={item.name}
                 style={
@@ -153,19 +161,31 @@ export function TypingDemoCard({
                 }
               >
                 <div>
-                  <div className="text-xs font-medium text-foreground">{item.name}</div>
-                  <div className="text-[10px] text-muted-foreground">{item.calories} kcal</div>
+                  <div className="text-xs font-medium text-foreground">
+                    {item.name}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground">
+                    {item.calories} kcal
+                  </div>
                 </div>
                 <div className="flex gap-2 text-[10px]">
-                  <span className="text-amber-600 dark:text-amber-300">{item.protein}P</span>
-                  <span className="text-amber-600 dark:text-amber-300">{item.carbs}C</span>
-                  <span className="text-rose-500 dark:text-rose-300">{item.fat}F</span>
+                  <span className="text-amber-600 dark:text-amber-300">
+                    {item.protein}P
+                  </span>
+                  <span className="text-amber-600 dark:text-amber-300">
+                    {item.carbs}C
+                  </span>
+                  <span className="text-rose-500 dark:text-rose-300">
+                    {item.fat}F
+                  </span>
                 </div>
               </div>
             ))}
             <div className="flex items-center justify-between border-t border-border pt-2">
               <span className="text-xs text-muted-foreground">Total</span>
-              <span className="text-sm font-semibold text-foreground">{totalCalories} kcal</span>
+              <span className="text-sm font-semibold text-foreground">
+                {totalCalories} kcal
+              </span>
             </div>
           </div>
         ) : null}

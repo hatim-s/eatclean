@@ -294,7 +294,7 @@ export function HeroSection({
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="landing-v2-glow absolute -left-20 top-10 size-[500px] rounded-full bg-amber-500/20 blur-[100px]" />
         <div
-          className="landing-v2-glow absolute -bottom-20 right-0 size-[400px] rounded-full bg-violet-500/15 blur-[100px]"
+          className="landing-v2-glow absolute -bottom-20 right-0 size-[400px] rounded-full bg-orange-500/15 blur-[100px]"
           style={{ animationDelay: "1.6s" }}
         />
       </div>
@@ -408,7 +408,7 @@ export function FeaturesSection({
       <div className="pointer-events-none absolute inset-0 bg-grid-pattern [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]" />
       {/* Accent glow */}
       <div className="pointer-events-none absolute -right-32 top-1/4 size-[400px] rounded-full bg-amber-400/15 blur-[120px]" />
-      <div className="pointer-events-none absolute -left-32 bottom-1/4 size-[300px] rounded-full bg-violet-400/10 blur-[100px]" />
+      <div className="pointer-events-none absolute -left-32 bottom-1/4 size-[300px] rounded-full bg-orange-400/10 blur-[100px]" />
       <div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6">
         <SectionHeader description={description} title={title} />
         <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -615,7 +615,7 @@ export function FaqSection({
       {/* Crosshatch pattern */}
       <div className="pointer-events-none absolute inset-0 bg-crosshatch-pattern [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]" />
       {/* Accent glow */}
-      <div className="pointer-events-none absolute -left-10 top-1/2 size-[350px] -translate-y-1/2 rounded-full bg-violet-400/10 blur-[100px]" />
+      <div className="pointer-events-none absolute -left-10 top-1/2 size-[350px] -translate-y-1/2 rounded-full bg-orange-400/10 blur-[100px]" />
       <div className="relative mx-auto w-full max-w-3xl px-4 sm:px-6">
         <SectionHeader title={title} />
 
