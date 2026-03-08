@@ -24,10 +24,10 @@ import {
   format,
   isSameDay,
   isYesterday,
-  parseISO,
   startOfWeek,
+  parseISO,
 } from "date-fns";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/ui/lib/utils";
 import { Button } from "@/ui/components/base/button";
 import {
@@ -46,6 +46,7 @@ import {
 } from "@/components/dashboard/DashboardWidgets";
 import { CALORIE_GOAL, MACRO_GOALS } from "@/components/dashboard/constants";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { useViewMonthUrlState } from "@/ui/hooks/use-view-month-url-state";
 
 const earliestYear = new Date().getFullYear();
 const latestYear = new Date().getFullYear();
@@ -68,72 +69,7 @@ type LandingCalendarProps = {
   summaries: DailySummary[];
   weeklySummaries: DailySummary[];
   recentMeals: FoodLog[];
-  monthlyLogs: FoodLog[];
 };
-
-const ZERO_MICRONUTRIENTS = {
-  fiber: 0,
-  saturatedFat: 0,
-  omega3: 0,
-  omega6: 0,
-  sodium: 0,
-  potassium: 0,
-  calcium: 0,
-  iron: 0,
-  magnesium: 0,
-  zinc: 0,
-  vitaminA: 0,
-  vitaminC: 0,
-  vitaminD: 0,
-  vitaminE: 0,
-  vitaminK: 0,
-  vitaminB1: 0,
-  vitaminB2: 0,
-  vitaminB3: 0,
-  vitaminB5: 0,
-  vitaminB6: 0,
-  vitaminB9: 0,
-  vitaminB12: 0,
-};
-
-function aggregateFoodLogs(entries: FoodLog[]): MacroSnapshot {
-  return entries.reduce(
-    (acc, entry) => ({
-      calories: acc.calories + Math.round(entry.calories),
-      protein: acc.protein + Math.round(entry.protein),
-      carbs: acc.carbs + Math.round(entry.carbs),
-      fat: acc.fat + Math.round(entry.fat),
-    }),
-    { calories: 0, protein: 0, carbs: 0, fat: 0 }
-  );
-}
-
-function formatMealType(mealType: string | null) {
-  if (!mealType) {
-    return "Meal";
-  }
-
-  return mealType.charAt(0).toUpperCase() + mealType.slice(1);
-}
-
-function getTimelineEntryTitle(entry: FoodLog) {
-  const items = Array.isArray(entry.items)
-    ? (entry.items as Array<{ name?: string }>)
-    : [];
-
-  if (!items.length || !items[0]?.name) {
-    return `${formatMealType(entry.mealType)} entry`;
-  }
-
-  const firstItem =
-    items[0].name.charAt(0).toUpperCase() + items[0].name.slice(1);
-
-  return items.length > 1 ? `${firstItem} +${items.length - 1}` : firstItem;
-}
-
-function getEntryCreatedAt(entry: FoodLog) {
-  return entry.createdAt instanceof Date ? entry.createdAt : new Date(entry.createdAt);
-}
 
 function getFeatureSnapshot(feature: Feature): MacroSnapshot {
   return {
@@ -216,21 +152,6 @@ function toFeature(summary: DailySummary): Feature {
   };
 }
 
-function toFallbackFeature(dateKey: string, entries: FoodLog[]): Feature {
-  const totals = aggregateFoodLogs(entries);
-
-  return {
-    id: `fallback-${dateKey}`,
-    date: parseISO(dateKey),
-    calories: totals.calories,
-    protein: totals.protein,
-    carbs: totals.carbs,
-    fat: totals.fat,
-    ...ZERO_MICRONUTRIENTS,
-    foodItems: [],
-  };
-}
-
 function shiftMonth(year: number, month: number, delta: -1 | 1) {
   const nextMonth = month + delta;
 
@@ -251,26 +172,23 @@ function shiftMonth(year: number, month: number, delta: -1 | 1) {
 function MobileCalendarControls() {
   const month = useCalendarMonth();
   const year = useCalendarYear();
-  const { setMonth, setYear } = useCalendarActions();
+  const { setViewMonth } = useCalendarActions();
 
   const monthLabel = format(new Date(year, month, 1), "MMMM yyyy");
 
   const goToPreviousMonth = () => {
     const next = shiftMonth(year, month, -1);
-    setMonth(next.month);
-    setYear(next.year);
+    setViewMonth(next.month, next.year);
   };
 
   const goToNextMonth = () => {
     const next = shiftMonth(year, month, 1);
-    setMonth(next.month);
-    setYear(next.year);
+    setViewMonth(next.month, next.year);
   };
 
   const goToToday = () => {
     const today = new Date();
-    setMonth(today.getMonth() as CalendarState["month"]);
-    setYear(today.getFullYear());
+    setViewMonth(today.getMonth() as CalendarState["month"], today.getFullYear());
   };
 
   return (
@@ -344,49 +262,54 @@ function LandingCalendar({
   summaries,
   weeklySummaries,
   recentMeals,
-  monthlyLogs,
 }: LandingCalendarProps) {
   const [mobileView, setMobileView] = useState<MobileDashboardView>("timeline");
+  const pendingUrlSyncRef = useRef<CalendarState | null>(null);
+  const calendarMonth = useCalendarMonth();
+  const calendarYear = useCalendarYear();
+  const { setOnViewMonthChange, setViewMonth: setCalendarViewMonth } =
+    useCalendarActions();
+  const {
+    month: urlMonth,
+    year: urlYear,
+    setViewMonth: setUrlViewMonth,
+  } = useViewMonthUrlState();
+
+  useEffect(() => {
+    setOnViewMonthChange(({ month, year }) => {
+      pendingUrlSyncRef.current = { month, year };
+      setUrlViewMonth({ month, year });
+    });
+
+    return () => {
+      setOnViewMonthChange(undefined);
+    };
+  }, [setOnViewMonthChange, setUrlViewMonth]);
+
+  useEffect(() => {
+    const pending = pendingUrlSyncRef.current;
+    if (pending && pending.month === urlMonth && pending.year === urlYear) {
+      pendingUrlSyncRef.current = null;
+      return;
+    }
+
+    if (pending) {
+      return;
+    }
+
+    if (calendarMonth === urlMonth && calendarYear === urlYear) {
+      return;
+    }
+
+    setCalendarViewMonth(urlMonth, urlYear);
+  }, [calendarMonth, calendarYear, setCalendarViewMonth, urlMonth, urlYear]);
 
   const features = useMemo(() => summaries.map(toFeature), [summaries]);
 
-  const entriesByDate = useMemo(() => {
-    const grouped = new Map<string, FoodLog[]>();
-
-    for (const log of monthlyLogs) {
-      const existing = grouped.get(log.logDate) ?? [];
-      existing.push(log);
-      grouped.set(log.logDate, existing);
-    }
-
-    for (const entries of grouped.values()) {
-      entries.sort(
-        (a, b) => getEntryCreatedAt(a).getTime() - getEntryCreatedAt(b).getTime()
-      );
-    }
-
-    return grouped;
-  }, [monthlyLogs]);
-
-  const mergedFeatures = useMemo(() => {
-    const withFallbacks = [...features];
-    const existingDates = new Set(
-      withFallbacks.map((feature) => format(feature.date, "yyyy-MM-dd"))
-    );
-
-    for (const [dateKey, entries] of entriesByDate.entries()) {
-      if (!existingDates.has(dateKey)) {
-        withFallbacks.push(toFallbackFeature(dateKey, entries));
-      }
-    }
-
-    return withFallbacks;
-  }, [entriesByDate, features]);
-
   const featureByDate = useMemo(
     () =>
-      new Map(mergedFeatures.map((feature) => [format(feature.date, "yyyy-MM-dd"), feature])),
-    [mergedFeatures]
+      new Map(features.map((feature) => [format(feature.date, "yyyy-MM-dd"), feature])),
+    [features]
   );
 
   const weeklyMetrics = useMemo(() => getWeeklyMetrics(weeklySummaries), [weeklySummaries]);
@@ -394,16 +317,17 @@ function LandingCalendar({
 
   const todayDate = new Date();
   const todayDateKey = format(todayDate, "yyyy-MM-dd");
-  const todayEntries = entriesByDate.get(todayDateKey) ?? [];
-
   const todayFeature = featureByDate.get(todayDateKey);
   const todaySummary = todayFeature
     ? getFeatureSnapshot(todayFeature)
-    : aggregateFoodLogs(todayEntries);
+    : { calories: 0, protein: 0, carbs: 0, fat: 0 };
 
   const timelineDateKeys = useMemo(
-    () => [...entriesByDate.keys()].sort((a, b) => b.localeCompare(a)),
-    [entriesByDate]
+    () =>
+      features
+        .map((feature) => format(feature.date, "yyyy-MM-dd"))
+        .sort((a, b) => b.localeCompare(a)),
+    [features]
   );
 
   const pastTimelineDateKeys = timelineDateKeys.filter(
@@ -455,46 +379,18 @@ function LandingCalendar({
                   triggerClassName="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                 />
               }
-            >
-              {todayEntries.length === 0 ? (
-                <p className="text-center text-sm text-muted-foreground">
-                  No meals logged yet for today.
-                </p>
-              ) : (
-                <div className="space-y-2 pt-1">
-                  {todayEntries.map((entry) => (
-                    <div
-                      key={entry.id}
-                      className="flex items-center gap-3 rounded-lg bg-muted/40 px-3 py-2"
-                    >
-                      <p className="w-16 shrink-0 text-xs text-muted-foreground">
-                        {format(getEntryCreatedAt(entry), "p")}
-                      </p>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-foreground">
-                          {getTimelineEntryTitle(entry)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {Math.round(entry.calories)} kcal
-                        </p>
-                      </div>
-                      <span className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
-                        {formatMealType(entry.mealType)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </DailySummaryCard>
+            />
 
             {pastTimelineDateKeys.length === 0 ? (
               <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-                No earlier entries for this month yet.
+                No earlier summaries for this month yet.
               </div>
             ) : (
               pastTimelineDateKeys.map((dateKey) => {
-                const entries = entriesByDate.get(dateKey) ?? [];
-                const feature = featureByDate.get(dateKey) ?? toFallbackFeature(dateKey, entries);
+                const feature = featureByDate.get(dateKey);
+                if (!feature) {
+                  return null;
+                }
                 const snapshot = getFeatureSnapshot(feature);
                 const parsedDate = parseISO(dateKey);
                 const label = isYesterday(parsedDate)
@@ -510,7 +406,6 @@ function LandingCalendar({
                     trigger={
                       <TimelineDayCard
                         label={label}
-                        mealCount={entries.length}
                         calories={snapshot.calories}
                         protein={snapshot.protein}
                         carbs={snapshot.carbs}
@@ -537,7 +432,7 @@ function LandingCalendar({
                 </div>
 
                 <CalendarBody
-                  features={mergedFeatures}
+                  features={features}
                   className="border-none px-3 pb-3 auto-rows-[minmax(3.25rem,1fr)]"
                   renderDay={({ day, date, features: dayFeatures, isToday }) => {
                     const dateStr = format(date, "yyyy-MM-dd");
@@ -574,14 +469,7 @@ function LandingCalendar({
                     );
                   }}
                 >
-                  {({ feature }) => (
-                    <FoodLogDialogWrapper
-                      foodLog={feature}
-                      key={feature.id}
-                      date={feature.date}
-                      isToday={isSameDay(feature.date, todayDate)}
-                    />
-                  )}
+                  {() => null}
                 </CalendarBody>
 
                 <div className="flex items-center justify-center gap-6 px-3 pb-3 pt-1 text-xs text-muted-foreground">
@@ -613,7 +501,7 @@ function LandingCalendar({
         )}
       </section>
 
-      <div className="hidden md:block h-full">
+      <div className="hidden md:flex h-full">
         <CalendarProvider className="w-full min-h-0 gap-10 flex-col xl:flex-row">
           <section className="flex min-w-0 flex-1 flex-col">
             <CalendarDate>
@@ -668,14 +556,7 @@ function LandingCalendar({
                 );
               }}
             >
-              {({ feature }) => (
-                <FoodLogDialogWrapper
-                  foodLog={feature}
-                  key={feature.id}
-                  date={feature.date}
-                  isToday={isSameDay(feature.date, new Date())}
-                />
-              )}
+              {() => null}
             </CalendarBody>
 
             <div className="flex items-center justify-center gap-6 mt-6 text-xs text-muted-foreground">

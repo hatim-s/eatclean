@@ -4,7 +4,6 @@ import { cn } from "@/ui/lib/utils";
 
 type TimelineDayCardProps = {
   label: string;
-  mealCount: number;
   calories: number;
   protein: number;
   carbs: number;
@@ -15,7 +14,6 @@ type TimelineDayCardProps = {
 
 export function TimelineDayCard({
   label,
-  mealCount,
   calories,
   protein,
   carbs,
@@ -35,9 +33,6 @@ export function TimelineDayCard({
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-base font-semibold text-foreground">{label}</p>
-          <p className="text-xs text-muted-foreground">
-            {mealCount} meal{mealCount === 1 ? "" : "s"}
-          </p>
         </div>
         <ChevronRight className="size-5 shrink-0 text-muted-foreground" />
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { FoodLogDialog } from "./FoodLogDialog";
 import { getFoodLogsByDate } from "@/actions/db/foodLog";
 import { Feature } from "@/ui/components/calendar";
@@ -18,6 +18,26 @@ interface FoodLogDialogWrapperProps {
   triggerClassName?: string;
 }
 
+const inFlightRequestsByDate = new Map<string, Promise<FoodLog[]>>();
+
+async function fetchFoodLogsByDateWithDedupe(dateStr: string): Promise<FoodLog[]> {
+  const existingRequest = inFlightRequestsByDate.get(dateStr);
+  if (existingRequest) {
+    return existingRequest;
+  }
+
+  const nextRequest = getFoodLogsByDate(dateStr);
+  inFlightRequestsByDate.set(dateStr, nextRequest);
+
+  try {
+    return await nextRequest;
+  } finally {
+    if (inFlightRequestsByDate.get(dateStr) === nextRequest) {
+      inFlightRequestsByDate.delete(dateStr);
+    }
+  }
+}
+
 export function FoodLogDialogWrapper({
   foodLog,
   date,
@@ -26,37 +46,43 @@ export function FoodLogDialogWrapper({
   triggerClassName,
 }: FoodLogDialogWrapperProps) {
   const [entries, setEntries] = useState<FoodLog[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [isEntriesLoading, setIsEntriesLoading] = useState(false);
+  const [entriesError, setEntriesError] = useState<string | null>(null);
   const dateStr = format(date, "yyyy-MM-dd");
 
-  const fetchEntries = useCallback(async () => {
+  const loadEntries = useCallback(async (force = false) => {
+    if (!force && hasLoaded) {
+      return;
+    }
+
+    setIsEntriesLoading(true);
+    setEntriesError(null);
+
     try {
-      const data = await getFoodLogsByDate(dateStr);
+      const data = await fetchFoodLogsByDateWithDedupe(dateStr);
       setEntries(data);
+      setHasLoaded(true);
     } catch (error) {
       console.error("Failed to fetch food logs:", error);
+      setEntriesError("Could not load entries for this day.");
+    } finally {
+      setIsEntriesLoading(false);
     }
-  }, [dateStr]);
+  }, [dateStr, hasLoaded]);
 
-  useEffect(() => {
-    let isMounted = true;
+  const handleOpenChange = useCallback((nextOpen: boolean) => {
+    setIsOpen(nextOpen);
+    if (nextOpen) {
+      void loadEntries(false);
+    }
+  }, [loadEntries]);
 
-    const loadEntries = async () => {
-      try {
-        const data = await getFoodLogsByDate(dateStr);
-        if (isMounted) {
-          setEntries(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch food logs:", error);
-      }
-    };
-
-    void loadEntries();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [dateStr]);
+  const refreshEntries = useCallback(() => {
+    setHasLoaded(false);
+    void loadEntries(true);
+  }, [loadEntries]);
 
   return (
     <FoodLogDialog
@@ -64,7 +90,11 @@ export function FoodLogDialogWrapper({
       date={date}
       isToday={isToday}
       entries={entries}
-      onRefresh={fetchEntries}
+      isEntriesLoading={isEntriesLoading}
+      entriesError={entriesError}
+      onRefresh={refreshEntries}
+      open={isOpen}
+      onOpenChange={handleOpenChange}
       trigger={trigger}
       triggerClassName={triggerClassName}
     />

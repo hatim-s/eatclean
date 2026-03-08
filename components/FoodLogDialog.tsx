@@ -56,7 +56,11 @@ export function FoodLogDialog({
   date,
   isToday,
   entries,
+  isEntriesLoading,
+  entriesError,
   onRefresh,
+  open,
+  onOpenChange,
   trigger,
   triggerClassName,
 }: {
@@ -66,7 +70,11 @@ export function FoodLogDialog({
   date: Date;
   isToday: boolean;
   entries?: FoodLog[];
-  onRefresh?: () => void;
+  isEntriesLoading?: boolean;
+  entriesError?: string | null;
+  onRefresh?: () => void | Promise<void>;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   trigger?: ReactNode;
   triggerClassName?: string;
 }) {
@@ -147,7 +155,7 @@ export function FoodLogDialog({
   const dateStr = date.toISOString().split('T')[0];
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       {trigger ? (
         <DialogTrigger className={triggerClassName}>{trigger}</DialogTrigger>
       ) : (
@@ -211,7 +219,13 @@ export function FoodLogDialog({
               {formattedDate}
             </DialogTitle>
             <p className="text-sm text-muted-foreground">
-              {entries && entries.length > 0 ? `${entries.length} entr${entries.length === 1 ? 'y' : 'ies'}` : 'No entries'}
+              {isEntriesLoading
+                ? "Loading entries..."
+                : entriesError
+                  ? "Unable to load entries"
+                  : entries && entries.length > 0
+                    ? `${entries.length} entr${entries.length === 1 ? "y" : "ies"}`
+                    : "No entries"}
             </p>
           </div>
           <DialogClose className="p-2 hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 rounded-lg transition-colors relative top-0 right-0">
@@ -234,7 +248,20 @@ export function FoodLogDialog({
           <TabsContent value="entries" className="flex-1 flex flex-col min-h-0 outline-none p-0 gap-0 data-[state=inactive]:hidden">
             <div className="flex-1 overflow-y-auto">
               <div className="space-y-3 m-5">
-                {entries && entries.length > 0 ? (
+                {isEntriesLoading ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground text-sm">Loading entries...</p>
+                  </div>
+                ) : entriesError ? (
+                  <div className="text-center py-8 space-y-3">
+                    <p className="text-destructive text-sm">{entriesError}</p>
+                    {onRefresh && (
+                      <Button variant="outline" size="sm" onClick={() => void onRefresh()}>
+                        Try again
+                      </Button>
+                    )}
+                  </div>
+                ) : entries && entries.length > 0 ? (
                   entries.map((entry) => (
                     <FoodLogEntryCard
                       key={`${entry.id}-${refreshKey}`}
@@ -254,7 +281,6 @@ export function FoodLogDialog({
             <div className="p-5 flex flex-row justify-end">
               <Button
                 onClick={() => setShowAddDialog(true)}
-              // className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
               >
                 <Plus size={18} />
                 Add Entry

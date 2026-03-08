@@ -40,18 +40,48 @@ type CalendarState = {
 };
 
 interface CalendarStore extends CalendarState {
+  onViewMonthChange?: (state: CalendarState) => void;
   actions: {
     setMonth: (month: CalendarState["month"]) => void;
     setYear: (year: CalendarState["year"]) => void;
+    setViewMonth: (month: CalendarState["month"], year: CalendarState["year"]) => void;
+    setOnViewMonthChange: (callback?: (state: CalendarState) => void) => void;
   };
 }
 
-const useCalendarStore = create<CalendarStore>((set) => ({
+const useCalendarStore = create<CalendarStore>((set, get) => ({
   month: new Date().getMonth() as CalendarState["month"],
   year: new Date().getFullYear(),
+  onViewMonthChange: undefined,
   actions: {
-    setMonth: (month) => set({ month }),
-    setYear: (year) => set({ year }),
+    setMonth: (month) => {
+      const state = get();
+      if (state.month === month) {
+        return;
+      }
+
+      state.onViewMonthChange?.({ month, year: state.year });
+      set({ month });
+    },
+    setYear: (year) => {
+      const state = get();
+      if (state.year === year) {
+        return;
+      }
+
+      state.onViewMonthChange?.({ month: state.month, year });
+      set({ year });
+    },
+    setViewMonth: (month, year) => {
+      const state = get();
+      if (state.month === month && state.year === year) {
+        return;
+      }
+
+      state.onViewMonthChange?.({ month, year });
+      set({ month, year });
+    },
+    setOnViewMonthChange: (callback) => set({ onViewMonthChange: callback }),
   },
 }));
 
@@ -472,25 +502,21 @@ type CalendarDatePaginationProps = {
 const CalendarDatePagination = ({ className }: CalendarDatePaginationProps) => {
   const month = useCalendarMonth();
   const year = useCalendarYear();
-  const { setMonth, setYear } = useCalendarActions();
+  const { setViewMonth } = useCalendarActions();
 
   const handlePreviousMonth = useCallback(() => {
-    if (month === 0) {
-      setMonth(11);
-      setYear(year - 1);
-    } else {
-      setMonth((month - 1) as CalendarState["month"]);
-    }
-  }, [month, year, setMonth, setYear]);
+    const previousMonth = month === 0 ? 11 : (month - 1) as CalendarState["month"];
+    const previousYear = month === 0 ? year - 1 : year;
+
+    setViewMonth(previousMonth, previousYear);
+  }, [month, year, setViewMonth]);
 
   const handleNextMonth = useCallback(() => {
-    if (month === 11) {
-      setMonth(0);
-      setYear(year + 1);
-    } else {
-      setMonth((month + 1) as CalendarState["month"]);
-    }
-  }, [month, year, setMonth, setYear]);
+    const nextMonth = month === 11 ? 0 : (month + 1) as CalendarState["month"];
+    const nextYear = month === 11 ? year + 1 : year;
+
+    setViewMonth(nextMonth, nextYear);
+  }, [month, year, setViewMonth]);
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
