@@ -4,6 +4,7 @@ import { AddFoodDialog } from "@/components/AddFoodDialog";
 import { UserMenu } from "@/components/UserMenu";
 import { Plus } from "lucide-react";
 import { format } from "date-fns";
+import { ThemeToggle } from "@/ui/components/theme-toggle";
 
 type DashboardHeaderActionsProps = {
   name?: string | null;
@@ -22,6 +23,7 @@ export function DashboardHeaderActions({
 
   return (
     <div className="flex items-center gap-2">
+      <ThemeToggle />
       <AddFoodDialog
         date={todayDate}
         hideTrigger

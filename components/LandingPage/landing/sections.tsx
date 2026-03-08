@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ThemeToggle } from "@/ui/components/theme-toggle";
 import {
   ArrowRight,
   Check,
@@ -189,7 +190,7 @@ export function LandingNavigation({
           <span className="inline-flex size-8 items-center justify-center rounded-lg bg-amber-500/20 text-amber-300">
             <Leaf className="size-4" />
           </span>
-          <span className="bg-gradient-to-r from-amber-400 to-yellow-200 bg-clip-text text-lg font-semibold text-transparent">
+          <span className="bg-linear-to-r from-amber-400 to-yellow-200 bg-clip-text text-lg font-semibold text-transparent">
             EatClean
           </span>
         </Link>
@@ -207,6 +208,7 @@ export function LandingNavigation({
         </nav>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Link
             className={buttonVariants({
               size: "sm",

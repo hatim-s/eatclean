@@ -18,9 +18,14 @@ import {
   SparklesIcon,
 } from "lucide-react";
 
+import { ThemeToggle } from "@/ui/components/theme-toggle";
+
 export default function SignInPage() {
   return (
     <div className="landing-v2 relative min-h-screen overflow-hidden bg-zinc-950 text-zinc-100">
+      <div className="absolute right-4 top-4 z-50">
+        <ThemeToggle />
+      </div>
       <div className="pointer-events-none absolute -top-28 left-1/4 h-72 w-72 rounded-full bg-amber-500/15 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-20 right-1/4 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl" />
 
