@@ -1,5 +1,6 @@
 "use client";
 
+import { format } from "date-fns";
 import { ReactNode, useState } from "react";
 import {
   Dialog,
@@ -195,7 +196,7 @@ export function FoodLogDialog({
     if (onRefresh) onRefresh();
   };
 
-  const dateStr = date.toISOString().split("T")[0];
+  const dateStr = format(date, "yyyy-MM-dd");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

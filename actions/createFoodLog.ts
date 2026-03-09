@@ -58,7 +58,7 @@ export async function createFoodLog(userInput: string) {
       foodName,
       candidates,
       bestCandidateId,
-    }))
+    })),
   );
   const matchResults = await Promise.allSettled(matchPromises);
 
@@ -82,17 +82,15 @@ export async function createFoodLog(userInput: string) {
   const foodVsNutrition: Record<string, CalculatedNutrition> = {};
   const foodVsQuantityGms: Record<string, number> = {};
   for (const [foodName, match] of Object.entries(foodVsMatches)) {
-    const quantityGms = foodLog.find((f) => f.food === foodName)?.portion_size_gms || 0;
+    const quantityGms =
+      foodLog.find((f) => f.food === foodName)?.portion_size_gms || 0;
     foodVsQuantityGms[foodName] = quantityGms;
-    const nutrition = calculateNutritionFromPortion(
-      match,
-      quantityGms
-    );
+    const nutrition = calculateNutritionFromPortion(match, quantityGms);
     foodVsNutrition[foodName] = nutrition;
   }
 
   const accumulatedNutrition = accumulateNutrition(
-    Object.values(foodVsNutrition)
+    Object.values(foodVsNutrition),
   );
 
   // Step 5: Return the results
@@ -107,7 +105,7 @@ export async function createFoodLog(userInput: string) {
           name: match.name,
           category: match.category,
         },
-      ])
+      ]),
     ),
     foodVsQuantityGms,
   };

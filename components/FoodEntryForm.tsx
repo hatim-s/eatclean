@@ -1,5 +1,6 @@
 "use client";
 
+import { format } from "date-fns";
 import { useState } from "react";
 import { Button } from "@/ui/components/base/button";
 import { Textarea } from "@/ui/components/base/textarea";
@@ -27,7 +28,7 @@ export function FoodEntryForm() {
       );
 
       void createFoodLogEntry({
-        logDate: new Date().toISOString().split("T")[0],
+        logDate: format(new Date(), "yyyy-MM-dd"),
         items: Object.entries(foodVsNutrition).map(([foodName, nutrition]) => ({
           name: foodName,
           ...nutrition,

@@ -3,6 +3,7 @@
 import { db, client } from "@/db/client";
 import { foods } from "@/db/schema";
 import { FoodItem } from "@/types/db";
+import { normalizeFoodSearchRow } from "./normalizeFoodSearchRow";
 
 export type FoodWithDistance = FoodItem & { distance: number };
 
@@ -38,12 +39,37 @@ export async function ftsFoodSearch(
     // Use libSQL client directly for FTS5 raw SQL query
     const result = await client.execute({
       sql: `SELECT 
-              foods.id, foods.name, foods.category,
-              foods.calories, foods.protein, foods.carbs, foods.fat, foods.fiber,
-              foods.saturated_fat, foods.omega_3, foods.omega_6,
-              foods.sodium, foods.potassium, foods.calcium, foods.iron, foods.magnesium, foods.zinc,
-              foods.vitamin_a, foods.vitamin_c, foods.vitamin_d, foods.vitamin_e, foods.vitamin_k,
-              foods.vitamin_b1, foods.vitamin_b2, foods.vitamin_b3, foods.vitamin_b5, foods.vitamin_b6, foods.vitamin_b9, foods.vitamin_b12
+              foods.id,
+              foods.name,
+              foods.category,
+              foods.data_source AS dataSource,
+              foods.calories,
+              foods.protein,
+              foods.carbs,
+              foods.fat,
+              foods.fiber,
+              foods.saturated_fat AS saturatedFat,
+              foods.omega_3 AS omega3,
+              foods.omega_6 AS omega6,
+              foods.sodium,
+              foods.potassium,
+              foods.calcium,
+              foods.iron,
+              foods.magnesium,
+              foods.zinc,
+              foods.vitamin_a AS vitaminA,
+              foods.vitamin_c AS vitaminC,
+              foods.vitamin_d AS vitaminD,
+              foods.vitamin_e AS vitaminE,
+              foods.vitamin_k AS vitaminK,
+              foods.vitamin_b1 AS vitaminB1,
+              foods.vitamin_b2 AS vitaminB2,
+              foods.vitamin_b3 AS vitaminB3,
+              foods.vitamin_b5 AS vitaminB5,
+              foods.vitamin_b6 AS vitaminB6,
+              foods.vitamin_b9 AS vitaminB9,
+              foods.vitamin_b12 AS vitaminB12,
+              foods.embedding
             FROM foods_fts 
             JOIN foods ON foods_fts.rowid = foods.id 
             WHERE foods_fts MATCH ?
@@ -51,7 +77,7 @@ export async function ftsFoodSearch(
             LIMIT ?`,
       args: [ftsQuery, limit],
     });
-    return result.rows as unknown as FoodItem[];
+    return result.rows.map((row) => normalizeFoodSearchRow(row));
   } catch (error) {
     console.warn("FTS search failed, falling back to lexical search:", error);
     return fallbackLexicalSearch(foodName, limit);

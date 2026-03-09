@@ -10,6 +10,8 @@ Always return ONLY a valid JSON array (no markdown, no explanations, no preamble
 - \`food\`: string (singular form, lowercase, raw ingredient name)
 - \`portion_size_gms\`: number (grams only, no unit)
 
+IMPORTANT: Even if there is a single food item, return an array with a single item.
+
 Example:
 \`\`\`json
 [
@@ -156,7 +158,7 @@ Do NOT add explanatory text. Just return empty array.
 `;
 
 export function getMessagesWithSystemPrompt(
-  messages: ChatCompletionMessageParam[]
+  messages: ChatCompletionMessageParam[],
 ) {
   // if the messages do not include a system prompt, add one
   if (!messages.some((message) => message.role === "system")) {
