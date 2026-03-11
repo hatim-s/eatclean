@@ -9,7 +9,7 @@ import {
     DialogFooter,
     DialogClose,
 } from "@/ui/components/base/dialog";
-import { Button } from "@/ui/components/base/button";
+import { Button, buttonVariants } from "@/ui/components/base/button";
 import { Trash2 } from "lucide-react";
 
 interface DeleteConfirmationDialogProps {
@@ -40,10 +40,8 @@ export function DeleteConfirmationDialog({
                     <DialogDescription>{description}</DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="gap-2 bg-background">
-                    <DialogClose>
-                        <Button variant="outline" disabled={isDeleting}>
-                            Cancel
-                        </Button>
+                    <DialogClose className={buttonVariants({ variant: "outline", size: "default", })} disabled={isDeleting}>
+                        Cancel
                     </DialogClose>
                     <Button
                         variant="destructive"
@@ -54,6 +52,6 @@ export function DeleteConfirmationDialog({
                     </Button>
                 </DialogFooter>
             </DialogContent>
-        </Dialog>
+        </Dialog >
     );
 }
