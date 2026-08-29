@@ -1,6 +1,3 @@
-import { config } from "dotenv";
-config({ path: ".env" });
-
 import { db } from "../db/client";
 import { foods } from "../db/schema";
 import {

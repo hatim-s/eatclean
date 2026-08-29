@@ -1,4 +1,3 @@
-import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
 type NutrientField =
@@ -205,10 +204,10 @@ function isRawFood(description: string): boolean {
   return !EXCLUDE_KEYWORDS.some((keyword) => lower.includes(keyword));
 }
 
-function processFoundationFoods(
+async function processFoundationFoods(
   dataDir: string,
   datasetType: DatasetType = "foundation"
-): ProcessedFood[] {
+): Promise<ProcessedFood[]> {
   console.log(
     `📂 Reading ${
       datasetType === "foundation" ? "Foundation Foods" : "SR Legacy"
@@ -220,9 +219,13 @@ function processFoundationFoods(
   const nutrientPath = join(dataDir, "food_nutrient.csv");
   const categoryPath = join(dataDir, "food_category.csv");
 
-  const foods = parseCSV<FoodRow>(readFileSync(foodPath, "utf-8"));
-  const nutrients = parseCSV<NutrientRow>(readFileSync(nutrientPath, "utf-8"));
-  const categories = parseCSV<CategoryRow>(readFileSync(categoryPath, "utf-8"));
+  const foods = parseCSV<FoodRow>(await Bun.file(foodPath).text());
+  const nutrients = parseCSV<NutrientRow>(
+    await Bun.file(nutrientPath).text()
+  );
+  const categories = parseCSV<CategoryRow>(
+    await Bun.file(categoryPath).text()
+  );
 
   console.log(`✓ Found ${foods.length} foods`);
   console.log(`✓ Found ${nutrients.length} nutrient entries`);
@@ -350,9 +353,9 @@ const dataDir = "./scripts/" + datasetType + "/input";
 const outputFile = "./scripts/" + datasetType + "/output.json";
 
 try {
-  const foods = processFoundationFoods(dataDir, datasetType);
+  const foods = await processFoundationFoods(dataDir, datasetType);
 
-  writeFileSync(outputFile, JSON.stringify(foods, null, 2), "utf-8");
+  await Bun.write(outputFile, JSON.stringify(foods, null, 2));
 
   console.log(`\n💾 Saved to: ${outputFile}`);
   console.log(`📊 Total entries: ${foods.length}`);

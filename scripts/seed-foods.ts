@@ -1,4 +1,3 @@
-import { config } from "dotenv";
 import { db } from "../db/client";
 import { foods } from "../db/schema";
 import foundationData from "./foundation/output.json";
@@ -36,8 +35,6 @@ type ProcessedFood = {
   vitamin_b9: number;
   vitamin_b12: number;
 };
-
-config({ path: ".env" });
 
 async function seed() {
   console.log("Starting food data seed...");
