@@ -1,14 +1,12 @@
 import type { NextConfig } from "next";
-
-const IS_DEV = process.env.NODE_ENV === "development";
+import { homedir } from "node:os";
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  turbopack: {
+    root: homedir(),
+  },
   serverExternalPackages: ["better-auth", "@libsql/client", "drizzle-orm"],
-  /* config options here */
-  experimental: {
-    turbopackUseSystemTlsCerts: IS_DEV,
-  }
 };
 
 export default nextConfig;
